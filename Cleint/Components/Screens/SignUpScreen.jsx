@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import {
   Image,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   SafeAreaView,
   StyleSheet,
@@ -48,7 +50,7 @@ function SignUpScreen({ navigation }) {
         return;
       }
       
-      const res = await fetch("http://localhost:3000/api/auth/signup", {
+      const res = await fetch("http://192.168.190.72:3000/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -67,6 +69,7 @@ function SignUpScreen({ navigation }) {
       }
       setLoading(false);
       setError(null);
+      console.log("data success ");
       navigation.navigate("SignIn");
     } catch (error) {
       setLoading(false);
@@ -79,7 +82,8 @@ function SignUpScreen({ navigation }) {
     <SafeAreaView>
       <View style={styles.Container}>
         <View style={styles.subContainer}>
-          <View style={styles.LogoContainer}>
+          <View  
+              style={styles.LogoContainer}>
             <Image source={require("../../assets/EJBlack.png")} />
             <Text style={styles.LogoCap}>Event Junction</Text>
           </View>
@@ -119,6 +123,7 @@ function SignUpScreen({ navigation }) {
               {loading ? "Loading.." : "SignUp"}
             </Text>
           </Pressable>
+          <Text style={styles.errorMsg}>{error? error:''}</Text>
         </View>
         <View style={styles.subContainer3}>
           <Text>
@@ -194,4 +199,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 15,
   },
+  errorMsg:{
+      color:'red',
+      maxWidth:'80%',
+      textAlign:'center'
+  }
 });
