@@ -13,7 +13,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <StatusBar />
-      <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName="Intrests">
+      <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName="SignUp">
         <Stack.Screen name="OnBoarding" component={SplashScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="SignIn" component={SignInScreen} />

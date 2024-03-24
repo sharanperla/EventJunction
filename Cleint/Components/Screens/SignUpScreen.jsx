@@ -1,14 +1,80 @@
-import React from "react";
-import { Image, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import {
+  Image,
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 
 function SignUpScreen({ navigation }) {
-  handlePress=()=>{
-    navigation.navigate("Home")
-}
-navigateToSignUp=()=>{
+  navigateToSignUp = () => {
     navigation.navigate("SignIn");
-}
+  };
+
+  const [formData, setFormData] = useState({});
+  const [passMatch, setPassMatch] = useState(true);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const handleChange = (key, value) => {
+    if (key === "password" || key === "confirm") {
+      // Check if both password and confirm are being changed
+      if (key === "password" && formData.confirm !== value) {
+        setPassMatch(false);
+      } else if (key === "confirm" && formData.password !== value) {
+        setPassMatch(false);
+      } else {
+        setPassMatch(true);
+      }
+    }
+    setFormData({
+      ...formData,
+      [key]: value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    try {
+      setLoading(true);
+      e.preventDefault();
+      const { confirm, ...restFormData } = formData;
+      // Check if passwords match
+      if (formData.password !== formData.confirm) {
+        setPassMatch(false);
+        setLoading(false);
+        console.log("doesnt match password");
+        return;
+      }
+      
+      const res = await fetch("http://localhost:3000/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(restFormData),
+      });
+      
+      const data = await res.json();
+      
+      console.log(data);
+      if (data.success === false) {
+        setError(data.message);
+        setLoading(false);
+        console.log("data success false");
+        return;
+      }
+      setLoading(false);
+      setError(null);
+      navigation.navigate("SignIn");
+    } catch (error) {
+      setLoading(false);
+      setError(true);
+      console.log("error in signup", error);
+    }
+  };
+
   return (
     <SafeAreaView>
       <View style={styles.Container}>
@@ -20,26 +86,45 @@ navigateToSignUp=()=>{
           <View style={styles.SignUpdisc}>
             <Text>Sign up to get started</Text>
           </View>
-        
         </View>
         <View style={styles.FormContainer}>
-          <TextInput style={styles.inputStyle} placeholder="enter email" />
-          <TextInput style={styles.inputStyle} placeholder="enter password" />
+          <TextInput
+            style={styles.inputStyle}
+            placeholder="enter username"
+            onChangeText={(text) => handleChange("username", text)}
+          />
+          <TextInput
+            style={styles.inputStyle}
+            placeholder="enter email"
+            onChangeText={(text) => handleChange("email", text)}
+          />
           <View style={styles.inputStyle}>
-            <TextInput placeholder="enter password" />
+            <TextInput
+              placeholder="enter password"
+              onChangeText={(text) => handleChange("password", text)}
+            />
           </View>
           <View style={styles.inputStyle}>
-            <TextInput placeholder="enter password" />
+            <TextInput
+              placeholder="enter password"
+              onChangeText={(text) => handleChange("confirm", text)}
+            />
           </View>
-          <Text style={styles.SplashButton} onPress={handlePress}>
-            SignUp
-          </Text>
+          {passMatch === false ? <Text>password doesnt match</Text> : ""}
+          <Pressable
+            onPress={
+              handleSubmit}
+          >
+            <Text style={styles.SplashButton}>
+              {loading ? "Loading.." : "SignUp"}
+            </Text>
+          </Pressable>
         </View>
         <View style={styles.subContainer3}>
           <Text>
             Dont have an acount?
             <Text onPress={navigateToSignUp} style={styles.HighText}>
-              signin
+              signIn
             </Text>
           </Text>
         </View>
@@ -51,7 +136,6 @@ navigateToSignUp=()=>{
 export default SignUpScreen;
 const styles = StyleSheet.create({
   Container: {
-
     height: "100%",
     paddingVertical: 20,
     display: "flex",
@@ -67,7 +151,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: -40,
-    paddingTop:40,
+    paddingTop: 40,
   },
   inputStyle: {
     width: 300,
@@ -92,7 +176,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 10,
-    marginTop:-100,
+    marginTop: -100,
   },
 
   SignUpdisc: {
@@ -105,10 +189,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 20,
   },
-  HighText:{
-    color:'#1976D2',
-    fontWeight:'bold',
-    fontSize:15,
-          }
-
+  HighText: {
+    color: "#1976D2",
+    fontWeight: "bold",
+    fontSize: 15,
+  },
 });
