@@ -6,17 +6,19 @@ import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "./Components/Screens/HomeScreen";
 import SignInScreen from "./Components/Screens/SignInScreen";
 import SignUpScreen from "./Components/Screens/SignUpScreen";
+import IntrestsScreen from "./Components/Screens/IntrestsScreen";
 
 export default function App() {
   const Stack = createStackNavigator();
   return (
     <NavigationContainer>
       <StatusBar />
-      <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName="OnBoarding">
+      <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName="Intrests">
         <Stack.Screen name="OnBoarding" component={SplashScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="SignIn" component={SignInScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
+        <Stack.Screen name="Intrests" component={IntrestsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

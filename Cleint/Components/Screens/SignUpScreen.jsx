@@ -3,9 +3,12 @@ import { Image, SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 
 function SignUpScreen({ navigation }) {
-  handlePress = () => {
+  handlePress=()=>{
+    navigation.navigate("Home")
+}
+navigateToSignUp=()=>{
     navigation.navigate("SignIn");
-  };
+}
   return (
     <SafeAreaView>
       <View style={styles.Container}>
@@ -15,8 +18,9 @@ function SignUpScreen({ navigation }) {
             <Text style={styles.LogoCap}>Event Junction</Text>
           </View>
           <View style={styles.SignUpdisc}>
-          <Text>Sign up to get started</Text>
+            <Text>Sign up to get started</Text>
           </View>
+        
         </View>
         <View style={styles.FormContainer}>
           <TextInput style={styles.inputStyle} placeholder="enter email" />
@@ -31,11 +35,11 @@ function SignUpScreen({ navigation }) {
             SignUp
           </Text>
         </View>
-        <View>
+        <View style={styles.subContainer3}>
           <Text>
             Dont have an acount?
             <Text onPress={navigateToSignUp} style={styles.HighText}>
-              signup
+              signin
             </Text>
           </Text>
         </View>
@@ -47,6 +51,7 @@ function SignUpScreen({ navigation }) {
 export default SignUpScreen;
 const styles = StyleSheet.create({
   Container: {
+
     height: "100%",
     paddingVertical: 20,
     display: "flex",
@@ -61,7 +66,8 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    gap: -30,
+    gap: -40,
+    paddingTop:40,
   },
   inputStyle: {
     width: 300,
@@ -86,18 +92,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 10,
+    marginTop:-100,
   },
 
-  SignUpdisc:{
-      textAlign:'center',
+  SignUpdisc: {
+    textAlign: "center",
   },
-  SignUpdisc:{
-    
-  },
-  subContainer:{
+  SignUpdisc: {},
+  subContainer: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    gap:20,
-  }
+    gap: 20,
+  },
+  HighText:{
+    color:'#1976D2',
+    fontWeight:'bold',
+    fontSize:15,
+          }
+
 });
