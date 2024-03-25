@@ -50,7 +50,7 @@ function SignUpScreen({ navigation }) {
         return;
       }
       
-      const res = await fetch("http://192.168.190.72:3000/api/auth/signup", {
+      const res = await fetch("http://192.168.43.4:3000/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

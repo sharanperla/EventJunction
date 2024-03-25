@@ -1,10 +1,47 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useDispatch, useSelector } from 'react-redux';
+import { signInFailure, signInStart, signInSuccess } from '../../redux/user/userSlice';
 
 function SignInScreen({navigation}) {
-    handlePress=()=>{
-        navigation.navigate("Home")
+  const [formData, setFormData] = useState({});
+  const {loading,error}=useSelector((state)=>state.user)
+  const dispatch=useDispatch();
+
+
+     const handleChange=(key,value)=>{
+      setFormData({
+        ...formData,
+        [key]: value,
+      });
+     }
+    handlePress= async(e)=>{
+      try {
+        dispatch(signInStart())
+        e.preventDefault();
+        const res=await fetch('http://192.168.43.4:3000/api/auth/signin',{
+          method:'POST',
+          headers:{
+            'Content-Type':'application/json',
+    },
+          body: JSON.stringify(formData),
+    
+        });
+
+        const data=await res.json();
+        if(data.success===false)
+        {
+          dispatch(signInFailure(data.message));
+          return;
+        }
+       dispatch(signInSuccess(data));
+        navigation.navigate("Home");
+        
+      } catch (error) {
+        dispatch(signInFailure(error.message))
+      }
+       
     }
 
 navigateToSignUp=()=>{
@@ -17,9 +54,10 @@ navigateToSignUp=()=>{
 
     </View>
       <View style={styles.BtnContainer}>
-                  <TextInput  style={styles.inputStyle} placeholder='enter email'/>
-                  <TextInput  style={styles.inputStyle} placeholder='enter password'/>
+                  <TextInput  style={styles.inputStyle} placeholder='enter email' onChangeText={(text) => handleChange("email", text)} />
+                  <TextInput  style={styles.inputStyle} placeholder='enter password' onChangeText={(text) => handleChange("password", text)} />
                   <Text style={styles.SplashButton} onPress={handlePress}>Login</Text>
+                <Text style={styles.errorMsg}>{error? error:''}</Text>
                 </View>
     <View>
         <Text>Dont have an acount?<Text onPress={navigateToSignUp} style={styles.HighText}>signup</Text></Text>
