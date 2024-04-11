@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux';
 import { signInFailure, signInStart, signInSuccess } from '../../redux/user/userSlice';
+import { AuthContext } from '../../Context/AuthContext';
 
 function SignInScreen({navigation}) {
+  const {currentUser,setCurrentUser,signInStart,signInSuccess,globalError,signInFailure}=useContext(AuthContext)
   const [formData, setFormData] = useState({});
   const {loading,error}=useSelector((state)=>state.user)
   const dispatch=useDispatch();
@@ -18,7 +20,7 @@ function SignInScreen({navigation}) {
      }
     handlePress= async(e)=>{
       try {
-        dispatch(signInStart())
+        signInStart()
         e.preventDefault();
         const res=await fetch('http://192.168.43.4:3000/api/auth/signin',{
           method:'POST',
@@ -30,16 +32,18 @@ function SignInScreen({navigation}) {
         });
 
         const data=await res.json();
+        
         if(data.success===false)
         {
-          dispatch(signInFailure(data.message));
+          
+          signInFailure(data.message)
           return;
         }
-       dispatch(signInSuccess(data));
-        navigation.navigate("Home");
+        signInSuccess(data)
+        // navigation.navigate("Home");
         
       } catch (error) {
-        dispatch(signInFailure(error.message))
+        signInFailure(error.message)
       }
        
     }
@@ -57,7 +61,7 @@ navigateToSignUp=()=>{
                   <TextInput  style={styles.inputStyle} placeholder='enter email' onChangeText={(text) => handleChange("email", text)} />
                   <TextInput  style={styles.inputStyle} placeholder='enter password' onChangeText={(text) => handleChange("password", text)} />
                   <Text style={styles.SplashButton} onPress={handlePress}>Login</Text>
-                <Text style={styles.errorMsg}>{error? error:''}</Text>
+                <Text style={styles.errorMsg}>{globalError? globalError:''}</Text>
                 </View>
     <View>
         <Text>Dont have an acount?<Text onPress={navigateToSignUp} style={styles.HighText}>signup</Text></Text>

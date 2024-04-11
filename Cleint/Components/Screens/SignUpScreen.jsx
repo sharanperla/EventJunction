@@ -160,10 +160,10 @@ const styles = StyleSheet.create({
   },
   inputStyle: {
     width: 300,
-    paddingHorizontal: 11,
-    paddingVertical: 14,
-    borderRadius: 10,
-    borderWidth: 1,
+        paddingHorizontal: 11,
+        paddingVertical: 10,
+        borderRadius: 10,
+        borderWidth:1,
   },
   SplashButton: {
     color: "#fff",

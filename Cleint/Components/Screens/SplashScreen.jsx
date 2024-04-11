@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Image, ImageBackground, StyleSheet, Text, View } from "react-native";
+import { AuthContext } from "../../Context/AuthContext";
 
 export default function SplashScreen({navigation}) {
     handlePress=()=>{
@@ -21,11 +22,13 @@ export default function SplashScreen({navigation}) {
                 </View>
                 <View style={styles.BtnContainer}>
                   <Text style={styles.SplashButton} onPress={handlePress}>Login</Text>
+                
                 </View>
       </View>
     </ImageBackground>
   );
 }
+
 
 const styles = StyleSheet.create({
     container:{
