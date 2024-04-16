@@ -1,10 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { Component } from "react";
+import React, { Component, useContext, useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContext } from "../../Context/AuthContext";
+
+
+
 
 export default function ProfileScreen ({navigation}) {
+  const {currentUser,setCurrentUser}=useContext(AuthContext)
+  const [loggedOut,setLoggedOut]=useState(false);
 
   const toEditBio =()=>{
     navigation.navigate("EditProfileScreen");
@@ -15,8 +22,23 @@ export default function ProfileScreen ({navigation}) {
 
   }
 
+  const logOut=()=>{
+    AsyncStorage.removeItem('authToken');
+    setCurrentUser(false);
+    console.log('logged Out');
+  }
+
+
     return (
       <SafeAreaView style={styles.container}>
+        <View style={styles.logOutButtonContainer}>
+        <Ionicons
+              name="log-out-outline"
+              color={"green"}
+              size={30}
+              onPress={logOut}
+            />
+        </View>
         <View style={styles.profileDataContainer}>
           <View style={styles.ProfileImageContainer}>
             <Image
@@ -90,4 +112,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  logOutButtonContainer:{
+   width:'100%',
+   alignItems:'flex-end',
+   paddingHorizontal:25
+  }
 });

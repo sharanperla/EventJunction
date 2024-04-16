@@ -1,9 +1,13 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux';
 import { signInFailure, signInStart, signInSuccess } from '../../redux/user/userSlice';
 import { AuthContext } from '../../Context/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+
 
 function SignInScreen({navigation}) {
   const {currentUser,setCurrentUser,signInStart,signInSuccess,globalError,signInFailure}=useContext(AuthContext)
@@ -39,7 +43,12 @@ function SignInScreen({navigation}) {
           signInFailure(data.message)
           return;
         }
+        // AsyncStorage.setItem('authToken','ji');
+        const AccessToken=data.token;
+        AsyncStorage.setItem('authToken', AccessToken );
         signInSuccess(data)
+        setCurrentUser(true)
+
         // navigation.navigate("Home");
         
       } catch (error) {
@@ -51,6 +60,7 @@ function SignInScreen({navigation}) {
 navigateToSignUp=()=>{
     navigation.navigate("SignUp")
 }
+
   return (
     <SafeAreaView>
         <View style={styles.container}>
