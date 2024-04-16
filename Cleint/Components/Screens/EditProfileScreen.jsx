@@ -1,9 +1,32 @@
 import { Ionicons } from '@expo/vector-icons'
-import React, { Component } from 'react'
+import React, { Component, useState } from 'react'
 import { Text, StyleSheet, View, Image, TextInput, Pressable } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+//instal npm install expo-image-picker
+import * as ImagePicker from 'expo-image-picker';
+
+
 export default function EditProfileScreen({navigation}){
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const pickImage = async () => {
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+  
+      if (!result.cancelled) {
+        setSelectedImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error("Error picking image:", error);
+    }
+  };
+  
 
     return (
       <SafeAreaView>
@@ -16,7 +39,7 @@ export default function EditProfileScreen({navigation}){
             <Image
               style={styles.ProfileImage}
               source={{
-                uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s",
+                uri: selectedImage?selectedImage: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s",
               }}
             />
             <Ionicons
@@ -24,6 +47,7 @@ export default function EditProfileScreen({navigation}){
               name="create"
               color={"green"}
               size={30}
+              onPress={pickImage}
             />
           </View>
         </View>
