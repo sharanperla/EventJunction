@@ -5,7 +5,8 @@ export const AuthContext=createContext();
 
 export const AuthProvider =({children})=>{
     const [isLoading,setIsLoading]=useState(false)
-    const [currentUser,setCurrentUser]=useState(true)
+    const [currentUser,setCurrentUser]=useState(false)
+    const [userData,setUserData]=useState(null)
     const [globalError,setGlobalError]=useState(null);
 
 
@@ -17,12 +18,12 @@ export const AuthProvider =({children})=>{
         console.log('err',error)
         setIsLoading(false);
         setGlobalError(error)
-        setCurrentUser(null);
+        setUserData(null);
     }
     signInSuccess=(value)=>{
         console.log(value);
         setIsLoading(false);
-        setCurrentUser(value);
+        setUserData(value);
       
         
     }
