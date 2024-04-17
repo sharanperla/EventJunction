@@ -1,14 +1,17 @@
 import { Ionicons } from '@expo/vector-icons'
-import React, { Component, useState } from 'react'
+import React, { Component, useContext, useState } from 'react'
 import { Text, StyleSheet, View, Image, TextInput, Pressable } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 //instal npm install expo-image-picker
 import * as ImagePicker from 'expo-image-picker';
+import { AuthContext } from '../../Context/AuthContext';
 
 
 export default function EditProfileScreen({navigation}){
+  const {profileUpdateStart,profileUpdateSuccess,profileUpdateFailure,userData}=useContext(AuthContext)
   const [selectedImage, setSelectedImage] = useState(null);
+  const [formData,setFormData]=useState({})
 
   const pickImage = async () => {
     try {
@@ -27,6 +30,41 @@ export default function EditProfileScreen({navigation}){
     }
   };
   
+  const handleChange = (fieldName, value) => {
+    setFormData({ ...formData, [fieldName]: value });
+  console.log('user hkhkhk',userData.user._id)
+    
+}
+const handleSubmit = async (e)=>{
+  try {
+    e.preventDefault();
+    profileUpdateStart();
+    
+
+    const res=await fetch(`/api/user/update/${userData.user._id}`,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+      },
+      body: JSON.stringify(formData),
+    })
+    const data= await res.json();
+    if(data.success===false)
+    {
+      profileUpdateFailure(data.message)
+      return
+
+    }
+    console.log("Form data submitted:", formData);
+    profileUpdateSuccess(data);
+
+  } catch (error) {
+    console.log(error);
+    profileUpdateFailure(error.message)
+    
+  }
+
+}
 
     return (
       <SafeAreaView>
@@ -55,19 +93,21 @@ export default function EditProfileScreen({navigation}){
         <TextInput
             style={styles.inputStyle}
             placeholder="username"
-            onChangeText={(text) => handleChange("username", text)}
+            onChangeText={(text) => handleChange('username', text)}
+            
           />
         <TextInput
             style={styles.inputStyle}
             placeholder="email@gmail.com"
-            onChangeText={(text) => handleChange("username", text)}
+            onChangeText={(text) => handleChange('email', text)}
+           
           />
         <TextInput
             style={styles.inputStyle}
             placeholder="Password"
-            onChangeText={(text) => handleChange("username", text)}
+            onChangeText={(text) => handleChange('password', text)}
           />
-           <Pressable>
+           <Pressable onPress={handleSubmit}>
             <Text style={styles.SplashButton}>
                update
             </Text>

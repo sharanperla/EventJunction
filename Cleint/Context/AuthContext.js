@@ -6,7 +6,7 @@ export const AuthContext=createContext();
 export const AuthProvider =({children})=>{
     const [isLoading,setIsLoading]=useState(false)
     const [currentUser,setCurrentUser]=useState(false)
-    const [userData,setUserData]=useState(null)
+    const [userData,setUserData]=useState({})
     const [globalError,setGlobalError]=useState(null);
 
 
@@ -21,14 +21,23 @@ export const AuthProvider =({children})=>{
         setUserData(null);
     }
     signInSuccess=(value)=>{
-        console.log(value);
         setIsLoading(false);
-        setUserData(value);
-      
-        
+        setUserData(value);    
+    }
+    profileUpdateStart=()=>{
+        setIsLoading(true)
+    }
+    profileUpdateSuccess=(data)=>{
+        setCurrentUser(data);
+        setIsLoading(false);
+        setGlobalError(null)
+    }
+    profileUpdateFailure=(error)=>{
+        setGlobalError(error)
+        setIsLoading(false)
     }
     return (
-        <AuthContext.Provider value={{currentUser,isLoading,setCurrentUser,globalError,signInStart,signInFailure,signInSuccess}}>
+        <AuthContext.Provider value={{currentUser,isLoading,setCurrentUser,globalError,signInStart,signInFailure,signInSuccess,profileUpdateStart,profileUpdateSuccess,profileUpdateFailure,userData}}>
             {children}
         </AuthContext.Provider>
     )
