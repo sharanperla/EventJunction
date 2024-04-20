@@ -28,7 +28,6 @@ export const AuthProvider =({children})=>{
         setIsLoading(true)
     }
     profileUpdateSuccess=(data)=>{
-        setCurrentUser(data);
         setIsLoading(false);
         setGlobalError(null)
     }
@@ -37,7 +36,7 @@ export const AuthProvider =({children})=>{
         setIsLoading(false)
     }
     return (
-        <AuthContext.Provider value={{currentUser,isLoading,setCurrentUser,globalError,signInStart,signInFailure,signInSuccess,profileUpdateStart,profileUpdateSuccess,profileUpdateFailure,userData}}>
+        <AuthContext.Provider value={{currentUser,isLoading,setCurrentUser,globalError,signInStart,signInFailure,signInSuccess,profileUpdateStart,profileUpdateSuccess,profileUpdateFailure,userData,setUserData}}>
             {children}
         </AuthContext.Provider>
     )

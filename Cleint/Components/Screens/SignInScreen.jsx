@@ -46,6 +46,7 @@ function SignInScreen({navigation}) {
         // AsyncStorage.setItem('authToken','ji');
         const AccessToken=data.token;
         AsyncStorage.setItem('authToken', AccessToken );
+        AsyncStorage.setItem('authData', JSON.stringify(data));
         signInSuccess(data)
         setCurrentUser(true)
 

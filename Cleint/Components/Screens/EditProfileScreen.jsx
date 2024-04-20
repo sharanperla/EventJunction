@@ -1,17 +1,110 @@
 import { Ionicons } from '@expo/vector-icons'
-import React, { Component, useContext, useState } from 'react'
+import React, { Component, useContext, useEffect, useState } from 'react'
 import { Text, StyleSheet, View, Image, TextInput, Pressable } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+
+//to setup firebase  go to firebase ,create storage and add rules as
+// service firebase.storage {
+//   match /b/{bucket}/o {
+//     match /{allPaths=**} {
+//       allow read;
+//       allow write: if
+//       request.resource.size<2 * 1024 *1024 &&
+//       request.resource.contentType.matches('image/.*')
+//     }
+//   }
+// }
+import {getDownloadURL, getStorage, ref, uploadBytesResumable} from 'firebase/storage';
+import {app} from '../../fireBase/firebase.config'
 //instal npm install expo-image-picker
 import * as ImagePicker from 'expo-image-picker';
 import { AuthContext } from '../../Context/AuthContext';
 
 
 export default function EditProfileScreen({navigation}){
-  const {profileUpdateStart,profileUpdateSuccess,profileUpdateFailure,userData}=useContext(AuthContext)
+  const {profileUpdateStart,profileUpdateSuccess,profileUpdateFailure,userData,setUserData}=useContext(AuthContext)
   const [selectedImage, setSelectedImage] = useState(null);
   const [formData,setFormData]=useState({})
+  const [filePerc,setFileperc]=useState(null)
+  const [fileUploadError,setFileUploadError]=useState(null);
+  console.log('user',userData)
+
+console.log(formData)
+const uploadImage = (selectedImage) => {
+  if (!selectedImage) {
+    console.log('No file selected');
+    return;
+  }
+  const storage = getStorage(app);
+  const fileName = new Date().getTime() + userData.user.username;
+  const storageRef = ref(storage, fileName);
+
+  // Convert the selected image URI to a Blob object
+  const blob = new Blob([selectedImage.uri], { type: 'image/jpeg' });
+
+  // Upload the blob to Firebase Storage
+  const uploadTask = uploadBytesResumable(storageRef, blob);
+
+  uploadTask.on(
+    'state_changed',
+    (snapshot) => {
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      setFileperc(Math.round(progress));
+    },
+    (error) => {
+      setFileUploadError(true);
+      console.error('Error uploading:', error);
+    },
+    () => {
+      getDownloadURL(uploadTask.snapshot.ref).then((downloadurl) => {
+        console.log('File uploaded successfully:', downloadurl);
+        setFormData({ ...formData, avatar: downloadurl });
+      });
+    }
+  );
+};
+  
+  
+  
+
+  useEffect(()=>{
+    if(selectedImage){
+      uploadImage(selectedImage);
+    }
+  },[selectedImage]);
+
+  
+
+  // console.log(userData)
+
+    // useEffect(() => {
+
+      // const uploadImage=async ()=>{
+      //  const blobImage=await new Promise((resolve,reject)=>{
+      //         const xhr=new XMLHttpRequest();
+      //         xhr.onload=function(){
+      //           resolve(xhr.response);
+      //         };
+      //         xhr.onerror=function(){
+      //           reject(new TypeError("Network request failed"))
+      //         };
+      //         xhr.responseType="blob";
+      //         xhr.open("GET",selectedImage,true);
+      //         xhr.send(null)
+      //  })
+
+
+     
+  //    if(selectedImage!==null)
+  //    {
+  //     uploadImage();
+  //    }
+  
+  //   return () => {
+      
+  //   }
+  // }, [selectedImage])
 
   const pickImage = async () => {
     try {
@@ -23,39 +116,45 @@ export default function EditProfileScreen({navigation}){
       });
   
       if (!result.cancelled) {
-        setSelectedImage(result.assets[0].uri);
-      }
+        setSelectedImage(result.assets[0]);
+        console.log('assets',result.assets[0])
+          }
     } catch (error) {
       console.error("Error picking image:", error);
     }
   };
-  
+
   const handleChange = (fieldName, value) => {
+    // Implement your logic to update the formData state based on the field name and value
     setFormData({ ...formData, [fieldName]: value });
-  console.log('user hkhkhk',userData.user._id)
-    
-}
+  };
+
 const handleSubmit = async (e)=>{
   try {
     e.preventDefault();
     profileUpdateStart();
-    
-
-    const res=await fetch(`/api/user/update/${userData.user._id}`,{
+    const res=await fetch(`http://192.168.43.4:3000/api/user/update/${userData.user._id}`,{
       method:'POST',
       headers:{
         'Content-Type':'application/json',
       },
       body: JSON.stringify(formData),
-    })
+    });
     const data= await res.json();
+    
     if(data.success===false)
     {
       profileUpdateFailure(data.message)
+      console.log('error at sucess',data)
       return
 
     }
-    console.log("Form data submitted:", formData);
+    console.log("Form data submitted:", data);
+    console.log('data before change',data);
+    setUserData({
+      ...userData, // Spread the existing userData object
+      user: data // Update the "user" property with the new value
+    });
     profileUpdateSuccess(data);
 
   } catch (error) {
@@ -65,6 +164,7 @@ const handleSubmit = async (e)=>{
   }
 
 }
+
 
     return (
       <SafeAreaView>
@@ -77,7 +177,7 @@ const handleSubmit = async (e)=>{
             <Image
               style={styles.ProfileImage}
               source={{
-                uri: selectedImage?selectedImage: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s",
+                uri: userData.user.avatar?userData.user.avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s",
               }}
             />
             <Ionicons
@@ -92,13 +192,13 @@ const handleSubmit = async (e)=>{
         <View style={styles.formCotainer}>
         <TextInput
             style={styles.inputStyle}
-            placeholder="username"
+            placeholder={userData.user?userData.user.username:"username"}
             onChangeText={(text) => handleChange('username', text)}
-            
+          
           />
         <TextInput
             style={styles.inputStyle}
-            placeholder="email@gmail.com"
+            placeholder={userData.user? userData.user.email :"email@gmail.com"}
             onChangeText={(text) => handleChange('email', text)}
            
           />

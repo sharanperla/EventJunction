@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Text } from 'react-native';
 
 const AppNav = () => {
-    const { currentUser ,setCurrentUser} = useContext(AuthContext);
+    const { currentUser ,setCurrentUser,setUserData} = useContext(AuthContext);
     const [accessToken, setAccessToken] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -17,7 +17,10 @@ const AppNav = () => {
         const getToken = async () => {
             try {
                 const authToken = await AsyncStorage.getItem('authToken');
+                const authDataString = await AsyncStorage.getItem('authData');
+                const authData = JSON.parse(authDataString);
                 setAccessToken(authToken);
+                setUserData(authData);
                 setCurrentUser(true);
                 setLoading(false); // Set loading to false after token retrieval
             } catch (error) {

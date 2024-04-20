@@ -1,5 +1,5 @@
 import express from 'express'
-import { updateUser } from '../Controller/user.controller';
+import { updateUser } from '../Controller/user.controller.js';
 
 const  userRouter= express.Router(); 
 

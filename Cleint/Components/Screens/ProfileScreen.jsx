@@ -24,6 +24,7 @@ export default function ProfileScreen ({navigation}) {
 
   const logOut=()=>{
     AsyncStorage.removeItem('authToken');
+    AsyncStorage.removeItem('authData');
     setCurrentUser(false);
     console.log('logged Out');
   }
