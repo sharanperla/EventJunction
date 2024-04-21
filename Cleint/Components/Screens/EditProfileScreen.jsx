@@ -30,6 +30,8 @@ export default function EditProfileScreen({navigation}){
   const [fileUploadError,setFileUploadError]=useState(null);
   const [fileUploadActive,setFileUploadActive]=useState(false);
 
+  console.log(formData)
+
   
 
 console.log(formData)
@@ -185,7 +187,7 @@ const handleSubmit = async (e)=>{
             <Image
               style={styles.ProfileImage}
               source={{
-                uri: userData.user.avatar?userData.user.avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s",
+                uri: formData.avatar?formData.avatar:userData.user.avatar?userData.user.avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s",
               }}
             />
             <Ionicons
