@@ -28,24 +28,29 @@ export default function EditProfileScreen({navigation}){
   const [formData,setFormData]=useState({})
   const [filePerc,setFileperc]=useState(null)
   const [fileUploadError,setFileUploadError]=useState(null);
-  console.log('user',userData)
+  const [fileUploadActive,setFileUploadActive]=useState(false);
+
+  
 
 console.log(formData)
-const uploadImage = (selectedImage) => {
+const uploadImage = async (selectedImage) => {
+try {
+  setFileUploadActive(true);
   if (!selectedImage) {
     console.log('No file selected');
+    setFileUploadActive(false);
     return;
   }
   const storage = getStorage(app);
   const fileName = new Date().getTime() + userData.user.username;
   const storageRef = ref(storage, fileName);
 
-  // Convert the selected image URI to a Blob object
-  const blob = new Blob([selectedImage.uri], { type: 'image/jpeg' });
+  const response = await fetch(selectedImage.uri);
+  const blob = await response.blob();
 
   // Upload the blob to Firebase Storage
   const uploadTask = uploadBytesResumable(storageRef, blob);
-
+  
   uploadTask.on(
     'state_changed',
     (snapshot) => {
@@ -55,17 +60,22 @@ const uploadImage = (selectedImage) => {
     (error) => {
       setFileUploadError(true);
       console.error('Error uploading:', error);
+      setFileUploadActive(false);
     },
     () => {
       getDownloadURL(uploadTask.snapshot.ref).then((downloadurl) => {
         console.log('File uploaded successfully:', downloadurl);
         setFormData({ ...formData, avatar: downloadurl });
+        setFileUploadActive(false);
       });
     }
   );
+} catch (error) {
+  console.log(error)
+}
 };
   
-  
+
   
 
   useEffect(()=>{
@@ -117,7 +127,6 @@ const uploadImage = (selectedImage) => {
   
       if (!result.cancelled) {
         setSelectedImage(result.assets[0]);
-        console.log('assets',result.assets[0])
           }
     } catch (error) {
       console.error("Error picking image:", error);
@@ -149,8 +158,7 @@ const handleSubmit = async (e)=>{
       return
 
     }
-    console.log("Form data submitted:", data);
-    console.log('data before change',data);
+    console.log("Form data submitted:");
     setUserData({
       ...userData, // Spread the existing userData object
       user: data // Update the "user" property with the new value
@@ -189,6 +197,9 @@ const handleSubmit = async (e)=>{
             />
           </View>
         </View>
+        <View style={styles.uploadData}>
+          {fileUploadError?(<Text style={styles.uploadFailureText}>Error in uploading image(size should be less than 2mb)</Text>) :filePerc > 0 && filePerc <100 ? (<Text >{`uploading ${filePerc}%`}</Text>) : filePerc===100?(<Text style={styles.uploadSuccessText}>Succesfully uploaded</Text>) : ''}
+        </View>
         <View style={styles.formCotainer}>
         <TextInput
             style={styles.inputStyle}
@@ -208,8 +219,8 @@ const handleSubmit = async (e)=>{
             onChangeText={(text) => handleChange('password', text)}
           />
            <Pressable onPress={handleSubmit}>
-            <Text style={styles.SplashButton}>
-               update
+            <Text style={styles.SplashButton} disabled={fileUploadActive}>
+               Save Changes
             </Text>
           </Pressable>
         </View>
@@ -275,5 +286,16 @@ const styles = StyleSheet.create({
         alignItems:'center',
         gap:10,
         padding:20,
+      },
+      uploadData:{
+        width:'100%',
+        justifyContent:'center',
+        alignItems:'center',
+      },
+      uploadSuccessText:{
+        color:"green",
+      },
+      uploadFailureText:{
+        color:'red'
       }
 })
