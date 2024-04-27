@@ -6,35 +6,69 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Calendar } from "react-native-calendars";
 import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";
-import MapView, { Marker } from 'react-native-maps';
-import * as Location from 'expo-location';
-
+import MapView, { Marker } from "react-native-maps";
+import * as Location from "expo-location";
+// import Geolocation from "@react-native-community/geolocation";
 
 export default function AddEvent() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isMapVisible, setIsMapVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [place,setPlace]=useState();
 
   const [selectedLocation, setSelectedLocation] = useState(null);
 
+  const [locPermission, setLocPermission] = useState();
 
-  const [locPermission,setLocPermission]=useState();
+
+  console.log('lock',selectedLocation)
+  console.log('user',locPermission)
+  //points to location
+
+  useEffect(() => {
+    if(selectedLocation){
+      const apiUrl = `https://nominatim.openstreetmap.org/reverse?lat=${selectedLocation.latitude}&lon=${selectedLocation.longitude}&format=json`;
+
+  fetch(apiUrl)
+  .then(response => response.json())
+  .then(data => {
+    // Parse and handle the response data
+    console.log('Address:', data);
+    setPlace( data.display_name)
+  })
+  .catch(error => {
+    console.error('Error fetching data:', error);
+  });
+
+    return () => {
+      
+    }
+
+    }
+    
+  }, [selectedLocation])
+  
+
+  
+ 
 
   //map configurations
   const handleMapPress = (event) => {
+    
     setSelectedLocation({
       latitude: event.nativeEvent.coordinate.latitude,
       longitude: event.nativeEvent.coordinate.longitude,
     });
+    
   };
   const handleConfirmLocation = () => {
     // Do something with the selected location
-    console.log(selectedLocation);
+    console.log('selected location',selectedLocation);
+    toggleMap()
   };
   const toggleMap = () => {
     setIsMapVisible(!isMapVisible);
   };
-
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
@@ -46,23 +80,23 @@ export default function AddEvent() {
   };
 
 
+
   //location config
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        console.error('Permission to access location was denied');
-      
+      if (status !== "granted") {
+        console.error("Permission to access location was denied");
+
         return;
       }
 
       // You can now access the user's location
       const location = await Location.getCurrentPositionAsync({});
-      setLocPermission(location)
-      console.log('User location:', location.coords);
+      setLocPermission(location);
+      console.log("User location:", location.coords);
     })();
   }, []);
-
 
   console.log(selectedDate);
   return (
@@ -92,13 +126,12 @@ export default function AddEvent() {
           <TouchableOpacity style={styles.CalinputStyle} onPress={toggleModal}>
             <TextInput
               placeholder="Select date"
-              value={selectedDate?selectedDate.dateString :"Select date"}
+              value={selectedDate ? selectedDate.dateString : "Select date"}
               // onChangeText={(text) => handleChange('email', text)}
             />
-            
-     
-                <Ionicons name="calendar" size={30} />
-            
+
+            <Ionicons name="calendar" size={30} />
+
             <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
               <View
                 style={{
@@ -117,56 +150,55 @@ export default function AddEvent() {
             </Modal>
           </TouchableOpacity>
           <View style={styles.placeContainer}>
-
-          <TextInput
-            style={styles.PlaceinputStyle}
-            placeholder="Place"
-            // onChangeText={(text) => handleChange('email', text)}
-          />
-          <TouchableOpacity style={styles.mapButton} onPress={toggleMap}>
-          <Ionicons name="location-outline" size={30} />
-          <Modal isVisible={isMapVisible} onBackdropPress={toggleMap}>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Calendar
-                  onDayPress={handleDayPress}
-                  markedDates={
-                    selectedDate ? { [selectedDate]: { selected: true } } : {}
-                  }
-                />
-              </View>
-            </Modal>
-          </TouchableOpacity>
+            <TextInput
+              style={styles.PlaceinputStyle}
+              placeholder={place?place:"Place"}
+              // onChangeText={(text) => handleChange('email', text)}
+            />
+            <TouchableOpacity style={styles.mapButton} onPress={toggleMap}>
+              <Ionicons name="location-outline" size={30} />
+              <Modal isVisible={isMapVisible} onBackdropPress={toggleMap}>
+                {/* <View
+                  style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Calendar
+                    onDayPress={handleDayPress}
+                    markedDates={
+                      selectedDate ? { [selectedDate]: { selected: true } } : {}
+                    }
+                  />
+                </View> */}
+                <View style={{ flex: 1 ,alignItems:'center',justifyContent:'center'}}>
+            
+            <MapView
+              style={{ width: 300, height: 300 }}
+              onPress={handleMapPress}
+              initialRegion={{
+                latitude: 37.78825,
+                longitude: -122.4324,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              }}
+            >
+              {selectedLocation && <Marker coordinate={selectedLocation} />}
+            </MapView>
+            <Button
+              title="Confirm Location"
+              onPress={handleConfirmLocation}
+              disabled={!selectedLocation}
+            />
           </View>
-          <View style={{ flex: 1 }}>
-          <Button
-        title="Confirm Location"
-        onPress={handleConfirmLocation}
-        disabled={!selectedLocation}
-      />
-      <MapView
-     style={{width:300,height:300}}
-        onPress={handleMapPress}
-        initialRegion={{
-          latitude: 37.78825,
-          longitude: -122.4324,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        }}
-      >
-        {selectedLocation && (
-          <Marker coordinate={selectedLocation} />
-        )}
-      </MapView>
-      
-    </View>
+              </Modal>
+            </TouchableOpacity>
+          </View>
+          
         </View>
       </View>
+      
     </SafeAreaView>
   );
 }
@@ -201,10 +233,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
   },
-  formContiner:{
-    alignItems:'center',
-    gap:10,
-    padding:20,
+  formContiner: {
+    alignItems: "center",
+    gap: 10,
+    padding: 20,
   },
   CalinputStyle: {
     width: 300,
@@ -216,26 +248,26 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  placeContainer:{
+  placeContainer: {
     width: 300,
-    gap:4,
-   
-    flexDirection:'row'
+    gap: 4,
+
+    flexDirection: "row",
   },
-  PlaceinputStyle:{
-   borderWidth:1,
-   paddingHorizontal: 11,
+  PlaceinputStyle: {
+    borderWidth: 1,
+    paddingHorizontal: 11,
     paddingVertical: 10,
-    flex:2,
+    flex: 2,
     borderRadius: 10,
   },
-  mapButton:{
-    flex:1,
-    borderWidth:1,
+  mapButton: {
+    flex: 1,
+    borderWidth: 1,
     paddingHorizontal: 11,
     paddingVertical: 10,
     borderRadius: 10,
-    alignItems:'center',
-    justifyContent:'center'
-  }
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
