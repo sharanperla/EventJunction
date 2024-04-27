@@ -1,15 +1,40 @@
-import React, { Component, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { Component, useEffect, useState } from "react";
+import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 // import {Calendar, LocaleConfig} from 'react-native-calendars';
 import { Calendar } from "react-native-calendars";
 import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";
+import MapView, { Marker } from 'react-native-maps';
+import * as Location from 'expo-location';
+
 
 export default function AddEvent() {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isMapVisible, setIsMapVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+
+  const [selectedLocation, setSelectedLocation] = useState(null);
+
+
+  const [locPermission,setLocPermission]=useState();
+
+  //map configurations
+  const handleMapPress = (event) => {
+    setSelectedLocation({
+      latitude: event.nativeEvent.coordinate.latitude,
+      longitude: event.nativeEvent.coordinate.longitude,
+    });
+  };
+  const handleConfirmLocation = () => {
+    // Do something with the selected location
+    console.log(selectedLocation);
+  };
+  const toggleMap = () => {
+    setIsMapVisible(!isMapVisible);
+  };
+
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
@@ -19,6 +44,26 @@ export default function AddEvent() {
     setSelectedDate(day);
     toggleModal();
   };
+
+
+  //location config
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.error('Permission to access location was denied');
+      
+        return;
+      }
+
+      // You can now access the user's location
+      const location = await Location.getCurrentPositionAsync({});
+      setLocPermission(location)
+      console.log('User location:', location.coords);
+    })();
+  }, []);
+
+
   console.log(selectedDate);
   return (
     <SafeAreaView>
@@ -51,10 +96,9 @@ export default function AddEvent() {
               // onChangeText={(text) => handleChange('email', text)}
             />
             
-              <Text>
-                {" "}
+     
                 <Ionicons name="calendar" size={30} />
-              </Text>
+            
             <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
               <View
                 style={{
@@ -79,10 +123,48 @@ export default function AddEvent() {
             placeholder="Place"
             // onChangeText={(text) => handleChange('email', text)}
           />
-          <View style={styles.mapButton}>
+          <TouchableOpacity style={styles.mapButton} onPress={toggleMap}>
           <Ionicons name="location-outline" size={30} />
+          <Modal isVisible={isMapVisible} onBackdropPress={toggleMap}>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Calendar
+                  onDayPress={handleDayPress}
+                  markedDates={
+                    selectedDate ? { [selectedDate]: { selected: true } } : {}
+                  }
+                />
+              </View>
+            </Modal>
+          </TouchableOpacity>
           </View>
-          </View>
+          <View style={{ flex: 1 }}>
+          <Button
+        title="Confirm Location"
+        onPress={handleConfirmLocation}
+        disabled={!selectedLocation}
+      />
+      <MapView
+     style={{width:300,height:300}}
+        onPress={handleMapPress}
+        initialRegion={{
+          latitude: 37.78825,
+          longitude: -122.4324,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
+      >
+        {selectedLocation && (
+          <Marker coordinate={selectedLocation} />
+        )}
+      </MapView>
+      
+    </View>
         </View>
       </View>
     </SafeAreaView>
