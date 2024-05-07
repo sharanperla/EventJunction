@@ -8,63 +8,54 @@ import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
+
+import RNPickerSelect from "react-native-picker-select";
 // import Geolocation from "@react-native-community/geolocation";
 
 export default function AddEvent() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isMapVisible, setIsMapVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [place,setPlace]=useState();
+  const [place, setPlace] = useState();
 
   const [selectedLocation, setSelectedLocation] = useState(null);
 
   const [locPermission, setLocPermission] = useState();
 
-
-  console.log('loc',selectedLocation)
-  console.log('user',locPermission)
+  console.log("loc", selectedLocation);
+  console.log("user", locPermission);
   //points to location
 
   useEffect(() => {
-    if(selectedLocation){
+    if (selectedLocation) {
       const apiUrl = `https://nominatim.openstreetmap.org/reverse?lat=${selectedLocation.latitude}&lon=${selectedLocation.longitude}&format=json`;
 
-  fetch(apiUrl)
-  .then(response => response.json())
-  .then(data => {
-    // Parse and handle the response data
-    console.log('Address:', data);
-    setPlace( data.display_name)
-  })
-  .catch(error => {
-    console.error('Error fetching data:', error);
-  });
+      fetch(apiUrl)
+        .then((response) => response.json())
+        .then((data) => {
+          // Parse and handle the response data
+          console.log("Address:", data);
+          setPlace(data.display_name);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
 
-    return () => {
-      
+      return () => {};
     }
-
-    }
-    
-  }, [selectedLocation])
-  
-
-  
- 
+  }, [selectedLocation]);
 
   //map configurations
   const handleMapPress = (event) => {
-    
     setSelectedLocation({
       latitude: event.nativeEvent.coordinate.latitude,
       longitude: event.nativeEvent.coordinate.longitude,
     });
-    
   };
   const handleConfirmLocation = () => {
     // Do something with the selected location
-    console.log('selected location',selectedLocation);
-    toggleMap()
+    console.log("selected location", selectedLocation);
+    toggleMap();
   };
   const toggleMap = () => {
     setIsMapVisible(!isMapVisible);
@@ -78,8 +69,6 @@ export default function AddEvent() {
     setSelectedDate(day);
     toggleModal();
   };
-
-
 
   //location config
   useEffect(() => {
@@ -118,6 +107,14 @@ export default function AddEvent() {
             placeholder="Event name"
             // onChangeText={(text) => handleChange('email', text)}
           />
+          <TextInput
+            style={styles.inputStyle}
+            multiline
+            numberOfLines={4} // Set the number of lines you want to display initially
+            // onChangeText={setText}
+            // value={text}
+            placeholder="Enter description text here..."
+          />
           {/* <Calendar
   onDayPress={day => {
     console.log('selected day', day);
@@ -152,7 +149,7 @@ export default function AddEvent() {
           <View style={styles.placeContainer}>
             <TextInput
               style={styles.PlaceinputStyle}
-              placeholder={place?place:"Place"}
+              placeholder={place ? place : "Place"}
               // onChangeText={(text) => handleChange('email', text)}
             />
             <TouchableOpacity style={styles.mapButton} onPress={toggleMap}>
@@ -172,36 +169,64 @@ export default function AddEvent() {
                     }
                   />
                 </View> */}
-                <View style={{ flex: 1 ,alignItems:'center',justifyContent:'center'}}>
-                
-          <MapView
-  style={{ width: 300, height: 300 }}
-  onPress={handleMapPress}
- 
-  initialRegion={{
-    latitude: locPermission? locPermission.coords.latitude : 37.78825,
-    longitude: locPermission? locPermission.coords.longitude : -122.4324,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
-  }}
->
-
-
-              {selectedLocation && <Marker coordinate={selectedLocation} />}
-            </MapView>
-            <Button
-              title="Confirm Location"
-              onPress={handleConfirmLocation}
-              disabled={!selectedLocation}
-            />
-          </View>
+                <View
+                  style={{
+                    flex: 1,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <MapView
+                    style={{ width: 300, height: 300 }}
+                    onPress={handleMapPress}
+                    initialRegion={{
+                      latitude: locPermission
+                        ? locPermission.coords.latitude
+                        : 37.78825,
+                      longitude: locPermission
+                        ? locPermission.coords.longitude
+                        : -122.4324,
+                      latitudeDelta: 0.0922,
+                      longitudeDelta: 0.0421,
+                    }}
+                  >
+                    {selectedLocation && (
+                      <Marker coordinate={selectedLocation} />
+                    )}
+                  </MapView>
+                  <Button
+                    title="Confirm Location"
+                    onPress={handleConfirmLocation}
+                    disabled={!selectedLocation}
+                  />
+                </View>
               </Modal>
             </TouchableOpacity>
           </View>
-          
+          <View style={styles.RNPStyle}>
+          <RNPickerSelect
+            placeholder={{ label: "Select an option...", value: null }}
+            // onValueChange={(value) => setSelectedValue(value)}
+            items={[
+              { label: "Comedy", value: "Comedy" },
+              { label: "Dance", value: "Dance" },
+              { label: "Dj", value: "DJ" },
+            ]}
+            
+          />
+          </View>
+
+          <View>
+          <TextInput
+        style={styles.inputStyle}
+        keyboardType="numeric"
+        // onChangeText={text => setNumber(text)}
+        // value={number}
+        placeholder="Enter Price amount in INR"
+      />
+          </View>
         </View>
       </View>
-      
     </SafeAreaView>
   );
 }
@@ -273,4 +298,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  RNPStyle:{
+    width: 300,
+    paddingHorizontal: 11,
+    paddingVertical: 0,
+    borderRadius: 10,
+    borderWidth: 1,
+  }
+
 });
