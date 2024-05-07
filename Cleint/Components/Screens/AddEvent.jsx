@@ -21,7 +21,7 @@ export default function AddEvent() {
   const [locPermission, setLocPermission] = useState();
 
 
-  console.log('lock',selectedLocation)
+  console.log('loc',selectedLocation)
   console.log('user',locPermission)
   //points to location
 
@@ -173,17 +173,20 @@ export default function AddEvent() {
                   />
                 </View> */}
                 <View style={{ flex: 1 ,alignItems:'center',justifyContent:'center'}}>
-            
-            <MapView
-              style={{ width: 300, height: 300 }}
-              onPress={handleMapPress}
-              initialRegion={{
-                latitude: 37.78825,
-                longitude: -122.4324,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
-              }}
-            >
+                
+          <MapView
+  style={{ width: 300, height: 300 }}
+  onPress={handleMapPress}
+ 
+  initialRegion={{
+    latitude: locPermission? locPermission.coords.latitude : 37.78825,
+    longitude: locPermission? locPermission.coords.longitude : -122.4324,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  }}
+>
+
+
               {selectedLocation && <Marker coordinate={selectedLocation} />}
             </MapView>
             <Button
