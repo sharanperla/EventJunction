@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useState } from "react";
-import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Button, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View ,Platform, ScrollView, Pressable,} from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 // import {Calendar, LocaleConfig} from 'react-native-calendars';
@@ -10,6 +10,7 @@ import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 
 import RNPickerSelect from "react-native-picker-select";
+
 // import Geolocation from "@react-native-community/geolocation";
 
 export default function AddEvent() {
@@ -17,6 +18,11 @@ export default function AddEvent() {
   const [isMapVisible, setIsMapVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [place, setPlace] = useState();
+  const [ename, setEname] = useState(null);
+  const [genere, setGenere] = useState(null);
+  const [amount, setAmount] = useState(null);
+
+  const [formData, setFormData] = useState({});
 
   const [selectedLocation, setSelectedLocation] = useState(null);
 
@@ -52,11 +58,7 @@ export default function AddEvent() {
       longitude: event.nativeEvent.coordinate.longitude,
     });
   };
-  const handleConfirmLocation = () => {
-    // Do something with the selected location
-    console.log("selected location", selectedLocation);
-    toggleMap();
-  };
+
   const toggleMap = () => {
     setIsMapVisible(!isMapVisible);
   };
@@ -65,9 +67,18 @@ export default function AddEvent() {
     setIsModalVisible(!isModalVisible);
   };
 
-  const handleDayPress = (day) => {
-    setSelectedDate(day);
-    toggleModal();
+  const handleChange = (key, value) => {
+    if (key === "eDate") {
+      toggleModal();
+    }
+    if (key === "eventLocation") {
+      toggleMap();
+    }
+    setFormData({
+      ...formData,
+      [key]: value,
+    });
+    console.log("formDAta", formData);
   };
 
   //location config
@@ -87,11 +98,12 @@ export default function AddEvent() {
     })();
   }, []);
 
-  console.log(selectedDate);
   return (
-    <SafeAreaView>
-      <View style={styles.Container}>
-        <View style={styles.descriptionContainer}>
+    <ScrollView >
+      <ScrollView horizontal={true} contentContainerStyle={styles.Container}>
+      <KeyboardAvoidingView  behavior={Platform.OS === "ios" ? "padding" : "height"}
+         style={styles.Container}>
+        {/* <View style={styles.descriptionContainer}>
           <Text style={styles.DescHead}>What can be Hosted</Text>
           <Text style={styles.Hostdesc}>
             Lorem ipsum, dolor sit amet consectetur adipisicing elit. Culpa eum,
@@ -99,31 +111,30 @@ export default function AddEvent() {
             laudantium distinctio rem, quidem architecto. Tempora vero ea
             aperiam quis a animi. Earum.
           </Text>
-        </View>
+        </View> */}
 
         <View style={styles.formContiner}>
+     
           <TextInput
             style={styles.inputStyle}
             placeholder="Event name"
-            // onChangeText={(text) => handleChange('email', text)}
+            onChangeText={(value) => handleChange("eventName", value)}
+            value={formData.eventName ? formData.eventName : ""}
           />
           <TextInput
             style={styles.inputStyle}
             multiline
             numberOfLines={4} // Set the number of lines you want to display initially
+            onChangeText={(value) => handleChange("eventDesc", value)}
             // onChangeText={setText}
-            // value={text}
+            value={formData.eventDesc ? formData.eventDesc : ""}
             placeholder="Enter description text here..."
           />
-          {/* <Calendar
-  onDayPress={day => {
-    console.log('selected day', day);
-  }}
-/> */}
+        
           <TouchableOpacity style={styles.CalinputStyle} onPress={toggleModal}>
             <TextInput
               placeholder="Select date"
-              value={selectedDate ? selectedDate.dateString : "Select date"}
+              value={formData.eDate ? formData.eDate.dateString : ""}
               // onChangeText={(text) => handleChange('email', text)}
             />
 
@@ -138,9 +149,11 @@ export default function AddEvent() {
                 }}
               >
                 <Calendar
-                  onDayPress={handleDayPress}
+                  onDayPress={(value) => handleChange("eDate", value)}
                   markedDates={
-                    selectedDate ? { [selectedDate]: { selected: true } } : {}
+                    formData.eDate
+                      ? { [formData.eDate]: { selected: true } }
+                      : {}
                   }
                 />
               </View>
@@ -150,7 +163,6 @@ export default function AddEvent() {
             <TextInput
               style={styles.PlaceinputStyle}
               placeholder={place ? place : "Place"}
-              // onChangeText={(text) => handleChange('email', text)}
             />
             <TouchableOpacity style={styles.mapButton} onPress={toggleMap}>
               <Ionicons name="location-outline" size={30} />
@@ -163,7 +175,7 @@ export default function AddEvent() {
                   }}
                 >
                   <Calendar
-                    onDayPress={handleDayPress}
+                    onDayPress={}
                     markedDates={
                       selectedDate ? { [selectedDate]: { selected: true } } : {}
                     }
@@ -196,7 +208,10 @@ export default function AddEvent() {
                   </MapView>
                   <Button
                     title="Confirm Location"
-                    onPress={handleConfirmLocation}
+                    onPress={() => {
+                      handleChange("eventLocation", selectedLocation);
+                      handleChange("place", place);
+                    }}
                     disabled={!selectedLocation}
                   />
                 </View>
@@ -204,30 +219,37 @@ export default function AddEvent() {
             </TouchableOpacity>
           </View>
           <View style={styles.RNPStyle}>
-          <RNPickerSelect
-            placeholder={{ label: "Select an option...", value: null }}
-            // onValueChange={(value) => setSelectedValue(value)}
-            items={[
-              { label: "Comedy", value: "Comedy" },
-              { label: "Dance", value: "Dance" },
-              { label: "Dj", value: "DJ" },
-            ]}
-            
-          />
+            <RNPickerSelect
+              placeholder={{ label: "Select an option...", value: null }}
+              onValueChange={(value) => handleChange("eventGenere", value)}
+              items={[
+                { label: "Comedy", value: "Comedy" },
+                { label: "Dance", value: "Dance" },
+                { label: "Dj", value: "DJ" },
+              ]}
+              value={formData.eventGenere ? formData.eventGenere : ""}
+            />
           </View>
 
           <View>
-          <TextInput
-        style={styles.inputStyle}
-        keyboardType="numeric"
-        // onChangeText={text => setNumber(text)}
-        // value={number}
-        placeholder="Enter Price amount in INR"
-      />
+           
+            <TextInput
+              style={styles.inputStyle}
+              keyboardType="numeric"
+              onValueChange={(value) => handleChange("eventAmount", value)}
+              value={formData.eventAmount ? formData.eventAmount : ""}
+              placeholder="Enter Price amount in INR"
+              />
+             
           </View>
+         <Pressable onPress={handleSubmit}>
+
+        <Text style={styles.SplashButton} >Create</Text>
+         </Pressable>
         </View>
-      </View>
-    </SafeAreaView>
+      </KeyboardAvoidingView>
+      </ScrollView>
+    </ScrollView>
   );
 }
 
@@ -235,6 +257,7 @@ const styles = StyleSheet.create({
   Container: {
     justifyContent: "center",
     alignItems: "center",
+    marginTop:50,
   },
   descriptionContainer: {
     flexGrow: 1,
@@ -262,9 +285,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   formContiner: {
+
     alignItems: "center",
+    justifyContent: "center",
     gap: 10,
-    padding: 20,
+    paddingHorizontal:30
+  
+
+    
   },
   CalinputStyle: {
     width: 300,
@@ -279,7 +307,6 @@ const styles = StyleSheet.create({
   placeContainer: {
     width: 300,
     gap: 4,
-
     flexDirection: "row",
   },
   PlaceinputStyle: {
@@ -298,12 +325,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  RNPStyle:{
+  RNPStyle: {
     width: 300,
     paddingHorizontal: 11,
     paddingVertical: 0,
     borderRadius: 10,
     borderWidth: 1,
-  }
-
+  },
+  SplashButton: {
+    color: "#fff",
+    backgroundColor: "#F10EDB",
+    width: 300,
+    paddingHorizontal: 11,
+    paddingVertical: 14,
+    borderRadius: 10,
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 18,
+  },
 });
