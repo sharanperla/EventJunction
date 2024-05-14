@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import authRouter from './Routes/auth.route.js';
 import cors from 'cors'
 import userRouter from './Routes/user.route.js';
+import eventRouter from './Routes/event.route.js';
 
 
 
@@ -27,6 +28,7 @@ app.listen(3000,()=>{
 })
 app.use('/api/auth',authRouter);
 app.use('/api/user',userRouter);
+app.use('/api/event',eventRouter);
 
 
 app.use((err,req,res,next)=>{

@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from "react";
+import React, { Component, useContext, useEffect, useState } from "react";
 import { Button, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View ,Platform, ScrollView, Pressable,} from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -10,10 +10,12 @@ import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 
 import RNPickerSelect from "react-native-picker-select";
+import { EventContext } from "../../Context/EventContext.js";
 
 // import Geolocation from "@react-native-community/geolocation";
 
 export default function AddEvent() {
+  const {isEventLoading,setIsEventLoading,eventData,globalError,createEventStart,createEventSucess,createEventFailure}=useContext(EventContext)
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isMapVisible, setIsMapVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -97,6 +99,44 @@ export default function AddEvent() {
       console.log("User location:", location.coords);
     })();
   }, []);
+
+
+  handleSubmit=async ()=>{
+    const formattedData = {
+      eDate: formData.eDate ? formData.eDate.dateString : null,
+      eventAmount: formData.eventAmount ? formData.eventAmount : null,
+      eventDesc: formData.eventDesc ? formData.eventDesc : null,
+      eventGenere: formData.eventGenere ? formData.eventGenere : null,
+      eventName: formData.eventName ? formData.eventName : null,
+      place: formData.place ? formData.place : "Location not selected",
+      eventLocation: formData.eventLocation ? formData.eventLocation : null,
+    };
+    try {
+      e.preventDefault();
+      createEventStart();
+      const res = await fetch("http://192.168.43.4:3000/api/event/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      const data = await res.json();
+      console.log(data);
+      if (data.success === false) {
+        createEventFailure(data.message)
+        console.log("data success false");
+        return;
+      }
+      createEventSucess(data);
+      console.log("data success "); 
+    } catch (error) {
+      createEventFailure(error);
+      console.log('error in submitting',error);
+    }
+    console.log("inside submit",formData)
+  }
 
   return (
     <ScrollView >
@@ -236,7 +276,7 @@ export default function AddEvent() {
             <TextInput
               style={styles.inputStyle}
               keyboardType="numeric"
-              onValueChange={(value) => handleChange("eventAmount", value)}
+              onChangeText={(value) => handleChange("eventAmount", value)}
               value={formData.eventAmount ? formData.eventAmount : ""}
               placeholder="Enter Price amount in INR"
               />
