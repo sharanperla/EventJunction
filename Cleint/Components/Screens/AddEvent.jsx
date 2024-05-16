@@ -1,38 +1,27 @@
-import React, { Component, useContext, useEffect, useState } from "react";
-import { Button, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View ,Platform, ScrollView, Pressable,} from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import { Button, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, Platform, ScrollView, Pressable } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
-// import {Calendar, LocaleConfig} from 'react-native-calendars';
 import { Calendar } from "react-native-calendars";
 import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
-
 import RNPickerSelect from "react-native-picker-select";
 import { EventContext } from "../../Context/EventContext.js";
+import { AuthContext } from "../../Context/AuthContext.js";
 
-// import Geolocation from "@react-native-community/geolocation";
-
-export default function AddEvent() {
-  const {isEventLoading,setIsEventLoading,eventData,globalError,createEventStart,createEventSucess,createEventFailure}=useContext(EventContext)
+export default function AddEvent({navigation}) {
+  const { isEventLoading, setIsEventLoading, eventData, globalError, createEventStart, createEventSuccess, createEventFailure } = useContext(EventContext);
+  const {userData } = useContext(AuthContext);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isMapVisible, setIsMapVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [place, setPlace] = useState();
-  const [ename, setEname] = useState(null);
-  const [genere, setGenere] = useState(null);
-  const [amount, setAmount] = useState(null);
-
+  const [place, setPlace] = useState(null);
   const [formData, setFormData] = useState({});
-
   const [selectedLocation, setSelectedLocation] = useState(null);
-
   const [locPermission, setLocPermission] = useState();
 
-  console.log("loc", selectedLocation);
-  console.log("user", locPermission);
-  //points to location
 
   useEffect(() => {
     if (selectedLocation) {
@@ -41,23 +30,24 @@ export default function AddEvent() {
       fetch(apiUrl)
         .then((response) => response.json())
         .then((data) => {
-          // Parse and handle the response data
           console.log("Address:", data);
           setPlace(data.display_name);
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
         });
-
-      return () => {};
     }
   }, [selectedLocation]);
 
-  //map configurations
   const handleMapPress = (event) => {
-    setSelectedLocation({
+    const newLocation = {
       latitude: event.nativeEvent.coordinate.latitude,
       longitude: event.nativeEvent.coordinate.longitude,
+    };
+    setSelectedLocation(newLocation);
+    setFormData({
+      ...formData,
+      eventLocation: newLocation,
     });
   };
 
@@ -83,25 +73,37 @@ export default function AddEvent() {
     console.log("formDAta", formData);
   };
 
-  //location config
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         console.error("Permission to access location was denied");
-
         return;
       }
-
-      // You can now access the user's location
       const location = await Location.getCurrentPositionAsync({});
       setLocPermission(location);
       console.log("User location:", location.coords);
     })();
   }, []);
 
+  const validateForm = () => {
+    const requiredFields = ["eventName", "eventDesc", "eDate", "eventGenere", "eventAmount"];
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        return `The field ${field} is required.`;
+      }
+    }
+    return null;
+  };
 
-  handleSubmit=async ()=>{
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const validationError = validateForm();
+    if (validationError) {
+      createEventFailure(validationError);
+      return;
+    }
+    
     const formattedData = {
       eDate: formData.eDate ? formData.eDate.dateString : null,
       eventAmount: formData.eventAmount ? formData.eventAmount : null,
@@ -112,181 +114,125 @@ export default function AddEvent() {
       eventLocation: formData.eventLocation ? formData.eventLocation : null,
     };
     try {
-      e.preventDefault();
       createEventStart();
       const res = await fetch("http://192.168.43.4:3000/api/event/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formattedData,
+          userRef:userData.user._id
+        }),
       });
-      
+
       const data = await res.json();
       console.log(data);
       if (data.success === false) {
-        createEventFailure(data.message)
+        createEventFailure(data.message);
         console.log("data success false");
         return;
       }
-      createEventSucess(data);
-      console.log("data success "); 
+      createEventSuccess(data);
+      navigation.navigate("EventSuccessScreen");
+      console.log("data success");
     } catch (error) {
       createEventFailure(error);
-      console.log('error in submitting',error);
+      console.log("error in submitting", error);
     }
-    console.log("inside submit",formData)
-  }
+    console.log("inside submit", formData);
+  };
 
   return (
-    <ScrollView >
+    <ScrollView>
       <ScrollView horizontal={true} contentContainerStyle={styles.Container}>
-      <KeyboardAvoidingView  behavior={Platform.OS === "ios" ? "padding" : "height"}
-         style={styles.Container}>
-        {/* <View style={styles.descriptionContainer}>
-          <Text style={styles.DescHead}>What can be Hosted</Text>
-          <Text style={styles.Hostdesc}>
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Culpa eum,
-            doloribus voluptatem maxime obcaecati placeat, repellat illum
-            laudantium distinctio rem, quidem architecto. Tempora vero ea
-            aperiam quis a animi. Earum.
-          </Text>
-        </View> */}
-
-        <View style={styles.formContiner}>
-     
-          <TextInput
-            style={styles.inputStyle}
-            placeholder="Event name"
-            onChangeText={(value) => handleChange("eventName", value)}
-            value={formData.eventName ? formData.eventName : ""}
-          />
-          <TextInput
-            style={styles.inputStyle}
-            multiline
-            numberOfLines={4} // Set the number of lines you want to display initially
-            onChangeText={(value) => handleChange("eventDesc", value)}
-            // onChangeText={setText}
-            value={formData.eventDesc ? formData.eventDesc : ""}
-            placeholder="Enter description text here..."
-          />
-        
-          <TouchableOpacity style={styles.CalinputStyle} onPress={toggleModal}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.Container}>
+          <View style={styles.formContiner}>
             <TextInput
-              placeholder="Select date"
-              value={formData.eDate ? formData.eDate.dateString : ""}
-              // onChangeText={(text) => handleChange('email', text)}
+              style={styles.inputStyle}
+              placeholder="Event name"
+              onChangeText={(value) => handleChange("eventName", value)}
+              value={formData.eventName ? formData.eventName : ""}
+            />
+            <TextInput
+              style={styles.inputStyle}
+              multiline
+              numberOfLines={4}
+              onChangeText={(value) => handleChange("eventDesc", value)}
+              value={formData.eventDesc ? formData.eventDesc : ""}
+              placeholder="Enter description text here..."
             />
 
-            <Ionicons name="calendar" size={30} />
-
-            <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Calendar
-                  onDayPress={(value) => handleChange("eDate", value)}
-                  markedDates={
-                    formData.eDate
-                      ? { [formData.eDate]: { selected: true } }
-                      : {}
-                  }
-                />
-              </View>
-            </Modal>
-          </TouchableOpacity>
-          <View style={styles.placeContainer}>
-            <TextInput
-              style={styles.PlaceinputStyle}
-              placeholder={place ? place : "Place"}
-            />
-            <TouchableOpacity style={styles.mapButton} onPress={toggleMap}>
-              <Ionicons name="location-outline" size={30} />
-              <Modal isVisible={isMapVisible} onBackdropPress={toggleMap}>
-                {/* <View
-                  style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
+            <TouchableOpacity style={styles.CalinputStyle} onPress={toggleModal}>
+              <TextInput placeholder="Select date" value={formData.eDate ? formData.eDate.dateString : ""} />
+              <Ionicons name="calendar" size={30} />
+              <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                   <Calendar
-                    onDayPress={}
-                    markedDates={
-                      selectedDate ? { [selectedDate]: { selected: true } } : {}
-                    }
-                  />
-                </View> */}
-                <View
-                  style={{
-                    flex: 1,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <MapView
-                    style={{ width: 300, height: 300 }}
-                    onPress={handleMapPress}
-                    initialRegion={{
-                      latitude: locPermission
-                        ? locPermission.coords.latitude
-                        : 37.78825,
-                      longitude: locPermission
-                        ? locPermission.coords.longitude
-                        : -122.4324,
-                      latitudeDelta: 0.0922,
-                      longitudeDelta: 0.0421,
-                    }}
-                  >
-                    {selectedLocation && (
-                      <Marker coordinate={selectedLocation} />
-                    )}
-                  </MapView>
-                  <Button
-                    title="Confirm Location"
-                    onPress={() => {
-                      handleChange("eventLocation", selectedLocation);
-                      handleChange("place", place);
-                    }}
-                    disabled={!selectedLocation}
+                    onDayPress={(value) => handleChange("eDate", value)}
+                    markedDates={formData.eDate ? { [formData.eDate]: { selected: true } } : {}}
                   />
                 </View>
               </Modal>
             </TouchableOpacity>
-          </View>
-          <View style={styles.RNPStyle}>
-            <RNPickerSelect
-              placeholder={{ label: "Select an option...", value: null }}
-              onValueChange={(value) => handleChange("eventGenere", value)}
-              items={[
-                { label: "Comedy", value: "Comedy" },
-                { label: "Dance", value: "Dance" },
-                { label: "Dj", value: "DJ" },
-              ]}
-              value={formData.eventGenere ? formData.eventGenere : ""}
-            />
-          </View>
-
-          <View>
-           
-            <TextInput
-              style={styles.inputStyle}
-              keyboardType="numeric"
-              onChangeText={(value) => handleChange("eventAmount", value)}
-              value={formData.eventAmount ? formData.eventAmount : ""}
-              placeholder="Enter Price amount in INR"
+            <View style={styles.placeContainer}>
+              <TextInput style={styles.PlaceinputStyle} placeholder={place ? place : "Place"} />
+              <TouchableOpacity style={styles.mapButton} onPress={toggleMap}>
+                <Ionicons name="location-outline" size={30} />
+                <Modal isVisible={isMapVisible} onBackdropPress={toggleMap}>
+                  <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                    <MapView
+                      style={{ width: 300, height: 300 }}
+                      onPress={handleMapPress}
+                      initialRegion={{
+                        latitude: locPermission ? locPermission.coords.latitude : 37.78825,
+                        longitude: locPermission ? locPermission.coords.longitude : -122.4324,
+                        latitudeDelta: 0.0922,
+                        longitudeDelta: 0.0421,
+                      }}
+                    >
+                      {selectedLocation && <Marker coordinate={selectedLocation} />}
+                    </MapView>
+                    <Button
+                      title="Confirm Location"
+                      onPress={() => {
+                        handleChange("eventLocation", selectedLocation);
+                        handleChange("place", place);
+                      }}
+                      disabled={!selectedLocation}
+                    />
+                  </View>
+                </Modal>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.RNPStyle}>
+              <RNPickerSelect
+                placeholder={{ label: "Select an option...", value: null }}
+                onValueChange={(value) => handleChange("eventGenere", value)}
+                items={[
+                  { label: "Comedy", value: "Comedy" },
+                  { label: "Dance", value: "Dance" },
+                  { label: "DJ", value: "DJ" },
+                ]}
+                value={formData.eventGenere ? formData.eventGenere : ""}
               />
-             
-          </View>
-         <Pressable onPress={handleSubmit}>
+            </View>
 
-        <Text style={styles.SplashButton} >Create</Text>
-         </Pressable>
-        </View>
+            <View>
+              <TextInput
+                style={styles.inputStyle}
+                keyboardType="numeric"
+                onChangeText={(value) => handleChange("eventAmount", value)}
+                value={formData.eventAmount ? formData.eventAmount : ""}
+                placeholder="Enter Price amount in INR"
+              />
+            </View>
+            <Pressable onPress={handleSubmit} disabled={isEventLoading}>
+              <Text style={styles.SplashButton}>{isEventLoading? "loading...":"create"}</Text>
+            </Pressable>
+            <Text style={styles.error}>{globalError?globalError:""}</Text>
+          </View>
+
       </KeyboardAvoidingView>
       </ScrollView>
     </ScrollView>
@@ -383,4 +329,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 18,
   },
+  error:{
+    color:'red',
+    fontSize:16,
+    
+  }
 });

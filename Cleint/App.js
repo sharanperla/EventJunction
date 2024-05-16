@@ -13,6 +13,7 @@ import { persistor, store } from "./redux/store.js";
 import AppNav from "./Navigation/AppNav";
 import { AuthProvider } from "./Context/AuthContext";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { EventProvider } from "./Context/EventContext";
 
 
 
@@ -22,6 +23,7 @@ export default function App() {
   return (
     <>
     <AuthProvider>
+    <EventProvider>
        <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
         <GestureHandlerRootView style={{ flex: 1 }}>
@@ -29,7 +31,8 @@ export default function App() {
           </GestureHandlerRootView>
         </PersistGate>
       </Provider>
-      </AuthProvider>
+    </EventProvider>
+    </AuthProvider>
     </>
   );
 }

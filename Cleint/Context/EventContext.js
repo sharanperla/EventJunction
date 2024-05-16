@@ -1,32 +1,41 @@
-import React,{createContext, useState} from "react";
+import React, { createContext, useState } from "react";
 
+export const EventContext = createContext();
 
-export const EventContext=createContext();
+export const EventProvider = ({ children }) => {
+  const [isEventLoading, setIsEventLoading] = useState(false);
+  const [eventData, setEventData] = useState({});
+  const [globalError, setGlobalError] = useState(null);
 
-export const EventProvider =({children})=>{
-    const [isEventLoading,setIsEventLoading]=useState(false)
-    const [eventData,setEventData]=useState({})
-    const [globalError,setGlobalError]=useState(null);
+  const createEventStart = () => {
+    setIsEventLoading(true);
+  };
 
+  const createEventSuccess = (value) => {
+    setIsEventLoading(false);
+    setEventData(value);
+  };
 
+  const createEventFailure = (error) => {
+    console.log('err',error)
+    setIsEventLoading(false);
+    setGlobalError(error);
+    setEventData(null);
+  };
 
-    createEventStart=()=>{
-        setIsEventLoading(true);
-    }
-    createEventSucess=(value)=>{
-        setIsEventLoading(false);
-        setEventData(value);   
-    }
-    createEventFailure=(error)=>{
-        console.log('err',error)
-        setIsEventLoading(false);
-        setGlobalError(error)
-        setEventData(null);
-    }
-    return (
-        <EventContext.Provider value={{isEventLoading,setIsEventLoading,eventData,globalError,createEventStart,createEventSucess,createEventFailure}}>
-            {children}
-        </EventContext.Provider>
-    )
-
-}
+  return (
+    <EventContext.Provider
+      value={{
+        isEventLoading,
+        setIsEventLoading,
+        eventData,
+        globalError,
+        createEventStart,
+        createEventSuccess,
+        createEventFailure
+      }}
+    >
+      {children}
+    </EventContext.Provider>
+  );
+};
