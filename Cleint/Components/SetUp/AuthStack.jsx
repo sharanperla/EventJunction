@@ -26,7 +26,7 @@ const AuthStack = () => {
 
   function ProfileStack() {
     return (
-      <Stack.Navigator initialRouteName="ProfileScreen" screenOptions={{headerShown: false}} >
+      <Stack.Navigator initialRouteName="EventSuccessScreen" screenOptions={{headerShown: false}} >
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
         <Stack.Screen name="AddEventScreen" component={AddEvent} />

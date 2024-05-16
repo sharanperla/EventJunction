@@ -146,7 +146,7 @@ export default function AddEvent({navigation}) {
   return (
     <ScrollView>
       <ScrollView horizontal={true} contentContainerStyle={styles.Container}>
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.Container}>
+        <KeyboardAvoidingView behavior={Platform.OS === "android" ? "padding" : "height"} style={styles.Container}>
           <View style={styles.formContiner}>
             <TextInput
               style={styles.inputStyle}
