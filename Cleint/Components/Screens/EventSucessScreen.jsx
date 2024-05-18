@@ -1,10 +1,20 @@
-import React from 'react'
+
+import React, { useEffect } from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 
 
-function EventSuccessScreen() {
+function EventSuccessScreen({navigation}) {
+ 
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.navigate('ProfileScreen');
+    }, 4000);
+
+    return () => clearTimeout(timer); // Cleanup the timer if the component unmounts
+  }, []);
   return (
     <SafeAreaView style={styles.MainContainer}>
       

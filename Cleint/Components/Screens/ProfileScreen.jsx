@@ -17,6 +17,9 @@ export default function ProfileScreen({ navigation }) {
   const toAddEvent = () => {
     navigation.navigate("AddEventScreen");
   };
+  const toMyEvents = () => {
+    navigation.navigate("AddEventScreen");
+  };
 
   const logOut = () => {
     AsyncStorage.removeItem("authToken");
@@ -41,7 +44,7 @@ export default function ProfileScreen({ navigation }) {
           <Image
             style={styles.ProfileImage}
             source={{
-              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s",
+              uri:  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s",
             }}
           />
 
@@ -62,37 +65,26 @@ export default function ProfileScreen({ navigation }) {
       {/* options */}
       <View style={styles.optionContainer}>
         <View style={styles.optionIconWithName}>
-        <Ionicons
-            name="calendar"
-            size={30}
-          />
-          <Text>Add event</Text>
-        </View> 
-          <Ionicons
-            name="chevron-forward"
-            size={30}
-            onPress={toAddEvent}
-          />
-
+          <Ionicons name="cash-outline" size={30} />
+          <Text>My events</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={30} onPress={toMyEvents} />
       </View>
       <View style={styles.optionContainer}>
         <View style={styles.optionIconWithName}>
-        <Ionicons
-            name="information-circle-outline"
-            size={30}
-          />
-          <Text>About us</Text>
-        </View> 
-          <Ionicons
-            name="chevron-forward"
-            size={30}
-            onPress={toAddEvent}
-          />
-
+          <Ionicons name="calendar" size={30} />
+          <Text>Add event</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={30} onPress={toAddEvent} />
       </View>
-      
-      
-      
+      <View style={styles.optionContainer}>
+        <View style={styles.optionIconWithName}>
+          <Ionicons name="information-circle-outline" size={30} />
+          <Text>About us</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={30} onPress={toAddEvent} />
+      </View>
+
       {/* <View style={styles.profileDataContainer}>
         <View style={styles.ProfileImageContainer}></View>
         <Text style={styles.NameText}>Subramanyeshwara prasad</Text>
@@ -123,7 +115,7 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
-  }, 
+  },
   EditProfileContainer: {
     width: "90%",
     display: "flex",
@@ -154,20 +146,20 @@ const styles = StyleSheet.create({
   mailText: {
     fontSize: 10,
   },
-  optionContainer:{
-    marginTop:10,
-    width:'90%',
-    flexDirection:'row',
-    justifyContent:'space-between',
-    borderBottomWidth:1,
-    padding:10,
-    borderColor:'#0001'
+  optionContainer: {
+    marginTop: 10,
+    width: "90%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    padding: 10,
+    borderColor: "#0001",
   },
-  optionIconWithName:{
-    flexDirection:'row',
-    justifyContent:'center',
-    alignItems:'center',
-    gap:8
+  optionIconWithName: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
   },
 
   profileDataContainer: {
@@ -176,7 +168,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 10,
   },
- 
+
   SplashButton: {
     color: "#fff",
     backgroundColor: "#F10EDB",
@@ -192,8 +184,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  
-  
-
-  
 });

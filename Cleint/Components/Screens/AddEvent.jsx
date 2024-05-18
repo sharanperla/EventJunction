@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Button, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, Platform, ScrollView, Pressable } from "react-native";
+import { Button, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, Platform, ScrollView, Pressable, Image } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Calendar } from "react-native-calendars";
@@ -10,6 +10,9 @@ import * as Location from "expo-location";
 import RNPickerSelect from "react-native-picker-select";
 import { EventContext } from "../../Context/EventContext.js";
 import { AuthContext } from "../../Context/AuthContext.js";
+import * as ImagePicker from 'expo-image-picker';
+import {getDownloadURL, getStorage, ref, uploadBytesResumable} from 'firebase/storage';
+import {app} from '../../fireBase/firebase.config.jsx'
 
 export default function AddEvent({navigation}) {
   const { isEventLoading, setIsEventLoading, eventData, globalError, createEventStart, createEventSuccess, createEventFailure } = useContext(EventContext);
@@ -17,10 +20,14 @@ export default function AddEvent({navigation}) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isMapVisible, setIsMapVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [fileperc,setFileperc]=useState(0);
+  const [fileUploadError,setFileUploadError]=useState(null);
   const [place, setPlace] = useState(null);
   const [formData, setFormData] = useState({});
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [locPermission, setLocPermission] = useState();
+  const [fileUploadActive,setFileUploadActive]=useState(false)
 
 
   useEffect(() => {
@@ -112,6 +119,7 @@ export default function AddEvent({navigation}) {
       eventName: formData.eventName ? formData.eventName : null,
       place: formData.place ? formData.place : "Location not selected",
       eventLocation: formData.eventLocation ? formData.eventLocation : null,
+      EventImage: formData.EventImage ? formData.EventImage : null,
     };
     try {
       createEventStart();
@@ -137,16 +145,95 @@ export default function AddEvent({navigation}) {
       navigation.navigate("EventSuccessScreen");
       console.log("data success");
     } catch (error) {
-      createEventFailure(error);
+      createEventFailure(error.message);
       console.log("error in submitting", error);
     }
     console.log("inside submit", formData);
   };
 
+  const uploadImage = async (selectedImage) => {
+    try {
+      setFileUploadActive(true);
+      if (!selectedImage) {     
+        console.log('No file selected');
+        setFileUploadActive(false);
+        return;
+      }
+      const storage = getStorage(app);
+      const fileName = new Date().getTime() + userData.user.username;
+      const storageRef = ref(storage, fileName);
+    
+      const response = await fetch(selectedImage.uri);
+      const blob = await response.blob();
+    
+      // Upload the blob to Firebase Storage
+      const uploadTask = uploadBytesResumable(storageRef, blob);
+      
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setFileperc(Math.round(progress));
+        },
+        (error) => {
+          setFileUploadError(true);
+          console.error('Error uploading:', error);
+          setFileUploadActive(false);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadurl) => {
+            console.log('File uploaded successfully:', downloadurl);
+            setFormData({ ...formData, EventImage: downloadurl });
+            setFileUploadActive(false);
+          });
+        }
+      );
+    } catch (error) {
+      console.log(error)
+    }
+    };
+
+
+  const pickImage = async () => {
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+  
+      if (!result.cancelled) {
+        
+        setSelectedImage(result.assets[0]);
+          }
+    } catch (error) {
+      console.error("Error picking image:", error);
+    }
+  };
+
+  useEffect(()=>{
+    if(selectedImage){
+      uploadImage(selectedImage);
+    }
+  },[selectedImage]);
+
+
   return (
     <ScrollView>
       <ScrollView horizontal={true} contentContainerStyle={styles.Container}>
         <KeyboardAvoidingView behavior={Platform.OS === "android" ? "padding" : "height"} style={styles.Container}>
+          <Pressable onPress={pickImage} style={styles.ImageContainer}>
+          <Image
+            style={styles.EventImage}
+            source={{
+              uri:formData.EventImage?formData.EventImage : "https://us.123rf.com/450wm/alextanya123rf/alextanya123rf1605/alextanya123rf160500117/56416894-black-and-white-vector-plus-sign-plus-size-icon-plus-logo-plus-symbol-design-element-addition-button.jpg",
+            }}
+          />
+          </Pressable>
+          <View style={styles.ImageUpload}>
+          {fileUploadError?(<Text style={styles.uploadFailureText}>Error in uploading image(size should be less than 2mb)</Text>) :fileperc > 0 && fileperc <100 ? (<Text >{`uploading ${fileperc}%`}</Text>) : fileperc===100?(<Text style={styles.uploadSuccessText}>Succesfully uploaded</Text>) : ''}
+        </View>
           <View style={styles.formContiner}>
             <TextInput
               style={styles.inputStyle}
@@ -333,5 +420,31 @@ const styles = StyleSheet.create({
     color:'red',
     fontSize:16,
     
-  }
+  },
+  ImageContainer:{
+    
+    width:300,
+    height:150,
+    margin:10,
+    borderRadius:40,
+    backgroundColor:'white',
+    overflow:'hidden',
+  
+
+  },
+  EventImage:{
+    width:'100%',
+    height:'100%',
+    objectFit:'contain'
+  },
+  uploadFailureText:{
+    color:'red',
+  },
+  uploadSuccessText:{
+    color:'green',
+  },
+  ImageUpload:{
+   padding:10,
+  },
+
 });

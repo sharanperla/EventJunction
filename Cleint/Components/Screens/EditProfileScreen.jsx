@@ -118,22 +118,22 @@ try {
   //   }
   // }, [selectedImage])
 
-  const pickImage = async () => {
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-  
-      if (!result.cancelled) {
-        setSelectedImage(result.assets[0]);
-          }
-    } catch (error) {
-      console.error("Error picking image:", error);
-    }
-  };
+    const pickImage = async () => {
+      try {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
+    
+        if (!result.cancelled) {
+          setSelectedImage(result.assets[0]);
+            }
+      } catch (error) {
+        console.error("Error picking image:", error);
+      }
+    };
 
   const handleChange = (fieldName, value) => {
     // Implement your logic to update the formData state based on the field name and value

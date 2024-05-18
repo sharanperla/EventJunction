@@ -14,6 +14,7 @@ export const EventProvider = ({ children }) => {
   const createEventSuccess = (value) => {
     setIsEventLoading(false);
     setEventData(value);
+    setGlobalError(null)
   };
 
   const createEventFailure = (error) => {
