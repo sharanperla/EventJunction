@@ -1,4 +1,5 @@
 import User from "../Models/user.model.js"
+import Event from "../Models/event.model.js"
 import { errorHandler } from "../utils/errorHandler.js"
 import bcryptjs from 'bcryptjs';
 
@@ -26,4 +27,24 @@ export const updateUser =async (req,res,next)=>{
     } catch (error) {
         next(error)
     }
+}
+
+export const getUserEvents = async (req,res,next)=>{
+  
+
+    if(req.params.id)
+    {
+        try {
+            
+            const listings =await Event.find({userRef:req.params.id})
+            res.status(200).json(listings)
+
+        } catch (error) {
+            next(error)
+        }
+
+    }else{
+        return next(errorHandler(401,'you can only update your lsiting'))
+    }
+
 }

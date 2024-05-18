@@ -7,8 +7,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../../Context/AuthContext";
 
 export default function ProfileScreen({ navigation }) {
-  const { currentUser, setCurrentUser } = useContext(AuthContext);
+  const { currentUser, setCurrentUser ,userData} = useContext(AuthContext);
   const [loggedOut, setLoggedOut] = useState(false);
+  console.log("userDta",userData.user._id);
 
   const toEditBio = () => {
     navigation.navigate("EditProfileScreen");
@@ -18,7 +19,7 @@ export default function ProfileScreen({ navigation }) {
     navigation.navigate("AddEventScreen");
   };
   const toMyEvents = () => {
-    navigation.navigate("AddEventScreen");
+    navigation.navigate("MyEventsScreen");
   };
 
   const logOut = () => {
@@ -44,13 +45,13 @@ export default function ProfileScreen({ navigation }) {
           <Image
             style={styles.ProfileImage}
             source={{
-              uri:  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s",
+              uri:userData?userData.user.avatar:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s",
             }}
           />
 
           <View style={styles.nameMailCOntainer}>
-            <Text style={styles.NameText}>Subramanyeshwara prasad</Text>
-            <Text style={styles.mailText}>Subramanyeshwara@gmail.com</Text>
+            <Text style={styles.NameText}>{userData&&userData.user.username}</Text>
+            <Text style={styles.mailText}>{userData&&userData.user.email}</Text>
           </View>
 
           <Ionicons

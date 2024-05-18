@@ -10,6 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import EditProfileScreen from "../Screens/EditProfileScreen";
 import AddEvent from "../Screens/AddEvent";
 import EventSuccessScreen from "../Screens/EventSucessScreen";
+import MyEventsScreen from "../Screens/MyEventsScreen";
 
 const AuthStack = () => {
   const Stack = createStackNavigator();
@@ -31,6 +32,7 @@ const AuthStack = () => {
         <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
         <Stack.Screen name="AddEventScreen" component={AddEvent} />
         <Stack.Screen name="EventSuccessScreen" component={EventSuccessScreen} />
+        <Stack.Screen name="MyEventsScreen" component={MyEventsScreen} />
       </Stack.Navigator>
     );
   }

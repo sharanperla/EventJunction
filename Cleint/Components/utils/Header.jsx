@@ -1,10 +1,12 @@
 import { Image, StyleSheet, Text, TextInput, View } from 'react-native'
-import React, { Component } from 'react'
+import React, { Component ,useContext} from 'react'
 import { Ionicons } from "@expo/vector-icons";
+import { AuthContext } from '../../Context/AuthContext';
 
 
-export default class Header extends Component {
-  render() {
+export default function Header() {
+  const {userData} = useContext(AuthContext);
+
     return (
       <View style={styles.headerContainer}>
         <View >
@@ -12,7 +14,7 @@ export default class Header extends Component {
         </View>
         <View style={styles.searchbarContainer}>
         <View style={styles.group1}>
-                <Text style={styles.absText}>Hi Sharan!</Text>
+                <Text style={styles.absText}>Hi {userData&&userData.user.username}!</Text>
                 <View style={styles.searchContainer}> 
                       <Ionicons  size={30} name="search"  />
                       <TextInput  placeholder='search...'  style={styles.TextInput} />
@@ -22,7 +24,7 @@ export default class Header extends Component {
       </View>
     )
   }
-}
+
 const styles = StyleSheet.create({
     headerContainer:{
         backgroundColor:'#FF1BE8',
