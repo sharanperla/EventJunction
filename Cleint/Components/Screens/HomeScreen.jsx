@@ -1,10 +1,18 @@
 import React ,{useState,useEffect} from 'react'
-import { Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Header from '../utils/Header'
+import HomeCourosel from '../utils/HomeCourosel';
+
+
 
 
 function HomeScreen() {
+
+
+ 
+
+
   const [getEventsError,setGetEventsError]=useState(false);
   const [allEvents,setAllEvents]=useState(false);
 
@@ -21,7 +29,7 @@ function HomeScreen() {
         return;
       }
       setAllEvents(data)
-      console.log(allEvents)
+      // console.log(allEvents)
     } catch (error) {
       setGetEventsError(true)
     }
@@ -29,12 +37,16 @@ function HomeScreen() {
   }
 
   useEffect(() => {
-    getEvents
+    getEvents();
   }, [])
   
   return (
-    <SafeAreaView>
+    <SafeAreaView >
        <Header/>
+       <View style={styles.container}>
+       <HomeCourosel data={allEvents}/>
+
+       </View>
       
 
 
@@ -43,3 +55,10 @@ function HomeScreen() {
 }
 
 export default HomeScreen
+
+const styles=StyleSheet.create({
+  container:{
+    padding:20,
+  }
+});
+

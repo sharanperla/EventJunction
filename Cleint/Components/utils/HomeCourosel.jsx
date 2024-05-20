@@ -1,45 +1,75 @@
-import React, { useState, useRef } from 'react';
-import { View, FlatList, Dimensions, StyleSheet } from 'react-native';
+import React from 'react';
+import { StyleSheet, FlatList, Image, ImageBackground, Text, View, Dimensions } from 'react-native';
 
-  
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const renderItem = ({ item, index }) => {
+export function HomeCourosel({ data }) {
+  const windowWidth = Dimensions.get('window').width;
+  return (
+    <View style={styles.container}>
+      <FlatList
+      contentContainerStyle={styles.flatListContent}
+        horizontal // Make the FlatList scroll horizontally
+        data={data}
+        showsHorizontalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <View style={styles.coroselContainer}>
+            <ImageBackground
+              source={{ uri: item.EventImage }}
+              style={styles.CouroselImage}
+            >
+              <View style={styles.overlay} />
+              <View style={styles.CouroselDetails}>
+                <Text style={styles.CouroselName}>{item.eventName}</Text>
+                <Text style={styles.CouroselPlace}>{item.place}</Text>
+              </View>
+            </ImageBackground>
+          </View>
+        )}
+        snapToAlignment="center" // Snap to center of the next item
+        snapToInterval={windowWidth-28}
+        decelerationRate={0.5} // Adjust deceleration rate if needed
+      />
+    </View>
+  );
+}
 
-const carouselRef = useRef(null);
+const styles = StyleSheet.create({
+  container: {
+  width:'100%'
+   // Set a specific height for the container
+  },
+  flatListContent: {
+    flexGrow: 1,
+    marginLeft:10,
+  },
+  coroselContainer: {
+    borderRadius: 10,
+    overflow: 'hidden',
+    marginRight: 10, // Add margin between items
+   width:315,
+ 
 
-const handleScrollToIndex = (index) => {
-  carouselRef.current.scrollToIndex({ animated: true, index });
-  setCurrentIndex(index);
-};
+  },
+  CouroselImage: {
+    height: 166,
+    width:'100%',
+    justifyContent: 'flex-end',
+  },
+  CouroselDetails: {
+    padding: 10,
+  },
+  CouroselName: {
+    fontSize: 20,
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  CouroselPlace: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.4)', // Semi-transparent black color
+  },
+});
 
-const handleSnapToItem = ({ layoutMeasurement, distanceFromCenter }) => {
-  const scrollOffset = layoutMeasurement.width * 0.5 - distanceFromCenter;
-  carouselRef.current.scrollToOffset({ animated: true, offset: scrollOffset });
-};
-
-    return (
-      <View style={styles.item}>
-       <FlatList
-  ref={carouselRef}
-  data={data}
-  horizontal={true}
-  showsHorizontalScrollIndicator={false}
-  snapToInterval={Dimensions.get('window').width} // Adjust as needed
-  snapToAlignment="center"
-  decelerationRate="fast"
-  renderItem={renderItem}
-  onScrollSnap={handleSnapToItem}
-  keyExtractor={(item) => item.id.toString()} // Replace with unique ID key
-/>
-
-{currentIndex > 0 && (
-  <Button title="<" onPress={() => handleScrollToIndex(currentIndex - 1)} />
-)}
-{currentIndex < data.length - 1 && (
-  <Button title=">" onPress={() => handleScrollToIndex(currentIndex + 1)} />
-)}
-
-      </View>
-    );
-  };
-  
+export default HomeCourosel;
