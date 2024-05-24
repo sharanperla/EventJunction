@@ -5,6 +5,7 @@ export function HomeCourosel({ data }) {
   const windowWidth = Dimensions.get('window').width;
   return (
     <View style={styles.container}>
+      
       <FlatList
       contentContainerStyle={styles.flatListContent}
         horizontal // Make the FlatList scroll horizontally
@@ -19,13 +20,13 @@ export function HomeCourosel({ data }) {
               <View style={styles.overlay} />
               <View style={styles.CouroselDetails}>
                 <Text style={styles.CouroselName}>{item.eventName}</Text>
-                <Text style={styles.CouroselPlace}>{item.place}</Text>
+                <Text style={styles.CouroselPlace}>{item.eventDesc}</Text>
               </View>
             </ImageBackground>
           </View>
         )}
         snapToAlignment="center" // Snap to center of the next item
-        snapToInterval={windowWidth-28}
+        snapToInterval={windowWidth-20}
         decelerationRate={0.5} // Adjust deceleration rate if needed
       />
     </View>
@@ -34,12 +35,14 @@ export function HomeCourosel({ data }) {
 
 const styles = StyleSheet.create({
   container: {
-  width:'100%'
+  width:'100%',
+
    // Set a specific height for the container
   },
   flatListContent: {
+    gap:20,
     flexGrow: 1,
-    marginLeft:10,
+    marginLeft:20,
   },
   coroselContainer: {
     borderRadius: 10,
