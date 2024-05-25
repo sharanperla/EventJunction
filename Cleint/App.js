@@ -7,30 +7,30 @@ import HomeScreen from "./Components/Screens/HomeScreen";
 import SignInScreen from "./Components/Screens/SignInScreen";
 import SignUpScreen from "./Components/Screens/SignUpScreen";
 import IntrestsScreen from "./Components/Screens/IntrestsScreen";
-import { Provider, useSelector } from "react-redux";
-import { PersistGate } from "redux-persist/integration/react";
-import { persistor, store } from "./redux/store.js";
+
 import AppNav from "./Navigation/AppNav";
 import { AuthProvider } from "./Context/AuthContext";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { EventProvider } from "./Context/EventContext";
 
+import { useEffect } from "react";
 
 
 export default function App() {
  
-
+ 
   return (
     <>
     <AuthProvider>
     <EventProvider>
-       <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
+       
         <GestureHandlerRootView style={{ flex: 1 }}>
+         
+
           <AppNav/>
+    
           </GestureHandlerRootView>
-        </PersistGate>
-      </Provider>
+       
     </EventProvider>
     </AuthProvider>
     </>

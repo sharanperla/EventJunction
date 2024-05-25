@@ -17,6 +17,9 @@ function HomeScreen() {
 
   const [getEventsError,setGetEventsError]=useState(false);
   const [allEvents,setAllEvents]=useState(false);
+  const [danceEvents,setDanceEvents]=useState({});
+
+  //allEvents
 
   const getEvents=async ()=>{
     try {
@@ -40,7 +43,31 @@ function HomeScreen() {
 
   useEffect(() => {
     getEvents();
+    getDanceEvents();
   }, [])
+
+  //genere=dance
+  const getDanceEvents=async ()=>{
+    try {
+      setGetEventsError(false)
+      const res=await fetch(`http://192.168.43.4:3000/api/event/getEvents?genre=Dance`)
+     
+      const data=await res.json();
+      if(data.success===false)
+      {
+      
+        setGetEventsError(true)
+        return;
+      }
+      setDanceEvents(data)
+      // console.log(allEvents)
+    } catch (error) {
+      setGetEventsError(true)
+    }
+    
+  }
+
+
   // console.log(allEvents)
   
   return (
@@ -53,8 +80,7 @@ function HomeScreen() {
        <HomeCourosel data={allEvents} />
        
        <Slider1 data={allEvents} name={"Recomended for you"}/>
-       <Slider1 data={allEvents} name={"Dance"}/>
-       
+       <Slider1 data={danceEvents} name={"Dance"}/>
        
 
        </View>
