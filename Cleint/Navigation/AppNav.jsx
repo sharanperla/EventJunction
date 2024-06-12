@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Text } from 'react-native';
 
 const AppNav = () => {
-    const { currentUser ,setCurrentUser,setUserData} = useContext(AuthContext);
+    const { currentUser ,setCurrentUser,setUserData,userData} = useContext(AuthContext);
     const [accessToken, setAccessToken] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -39,7 +39,8 @@ const AppNav = () => {
     return (
         <NavigationContainer>
             <StatusBar />
-            {currentUser !== false ? <AuthStack /> : <AppStack />}
+            {console.log(userData)}
+            {currentUser !== false && userData !== null  ? <AuthStack /> : <AppStack />}
         </NavigationContainer>
     );
 }

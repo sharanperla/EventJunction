@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useDispatch, useSelector } from 'react-redux';
+// import { useDispatch, useSelector } from 'react-redux';
 import { AuthContext } from '../../Context/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -11,8 +11,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 function SignInScreen({navigation}) {
   const {currentUser,setCurrentUser,signInStart,signInSuccess,globalError,signInFailure}=useContext(AuthContext)
   const [formData, setFormData] = useState({});
-  const {loading,error}=useSelector((state)=>state.user)
-  const dispatch=useDispatch();
+  // const {loading,error}=useSelector((state)=>state.user)
+
 
 
      const handleChange=(key,value)=>{

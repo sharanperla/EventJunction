@@ -11,6 +11,7 @@ import EditProfileScreen from "../Screens/EditProfileScreen";
 import AddEvent from "../Screens/AddEvent";
 import EventSuccessScreen from "../Screens/EventSucessScreen";
 import MyEventsScreen from "../Screens/MyEventsScreen";
+import DisplayScreen from "../Screens/DisplayScreen";
 
 const AuthStack = () => {
   const Stack = createStackNavigator();
@@ -18,8 +19,9 @@ const AuthStack = () => {
   
   function HomeStack() {
     return (
-      <Stack.Navigator initialRouteName="HomeScreen" screenOptions={{headerShown: false}} >
+      <Stack.Navigator initialRouteName="DisplayScreen" screenOptions={{headerShown: false}} >
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
+        <Stack.Screen name="DisplayScreen" component={DisplayScreen} />
       </Stack.Navigator>
     );
   }
@@ -33,6 +35,7 @@ const AuthStack = () => {
         <Stack.Screen name="AddEventScreen" component={AddEvent} />
         <Stack.Screen name="EventSuccessScreen" component={EventSuccessScreen} />
         <Stack.Screen name="MyEventsScreen" component={MyEventsScreen} />
+    
       </Stack.Navigator>
     );
   }
