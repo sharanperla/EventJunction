@@ -76,7 +76,7 @@ function HomeScreen() {
      <ScrollView>
        <Header/>
        
-       <View style={styles.container}>
+       <View style={styles.container} >
        <HomeCourosel data={allEvents} />
        
        <Slider1 data={allEvents} name={"Recomended for you"}/>

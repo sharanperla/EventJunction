@@ -4,14 +4,22 @@ import { Image, StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const DisplayScreen = () => {
+const DisplayScreen = ({route,navigation}) => {
+
+  const eventData = route.params?.data;
+  if (!route) {
+    // Handle cases where data is missing (e.g., display an error message)
+    return <Text>Error: Event data not found!</Text>;
+  }
+  console.log('data to display',eventData)
+
   return (
     <SafeAreaView>
       <ScrollView>
         <Image
           style={styles.DisplayImg}
           source={{
-              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s",
+              uri: eventData.EventImage?eventData.EventImage: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s",
             }}
         />
             <Ionicons name="arrow-back-outline" style={styles.backButton} onPress={()=>navigation.goBack()} size={30} /> 
@@ -21,7 +29,7 @@ const DisplayScreen = () => {
           <View style={styles.priceSlip}>
             <View style={styles.group1}>
               <Text style={styles.priceLabel}>Price</Text>
-              <Text style={styles.price}>10000</Text>
+              <Text style={styles.price}>{eventData.eventAmount?eventData.eventAmount:'0'} ₹</Text>
             </View>
             <View style={styles.group1}>
                     <Text style={styles.priceLabel}>Participants</Text>
@@ -54,12 +62,12 @@ const DisplayScreen = () => {
             </View>
           </View>
           <View style={{gap:5}}>
-           <Text style={styles.header1}>Indian riders fest 2023 </Text>
+           <Text style={styles.header1}>{eventData.eventName?eventData.eventName:' '}</Text>
            <View>
 
            <View style={styles.tagContainer}>
-           <Text style={styles.tag}>Kabban Park</Text>
-           <Text style={styles.tag}>12-00-2003</Text>
+           <Text style={styles.tag}>{eventData.place?eventData.place:' '}</Text>
+           <Text style={styles.tag}>{eventData.eDate?eventData.eDate.substring(0,10):' '}</Text>
             </View>
             <Text style={styles.eventGenere}>
             Dama * 

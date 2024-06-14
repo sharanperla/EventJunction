@@ -13,13 +13,14 @@ import EventSuccessScreen from "../Screens/EventSucessScreen";
 import MyEventsScreen from "../Screens/MyEventsScreen";
 import DisplayScreen from "../Screens/DisplayScreen";
 
+
 const AuthStack = () => {
   const Stack = createStackNavigator();
   const Tab = createBottomTabNavigator();
   
   function HomeStack() {
     return (
-      <Stack.Navigator initialRouteName="DisplayScreen" screenOptions={{headerShown: false}} >
+      <Stack.Navigator initialRouteName="HomeScreen" screenOptions={{headerShown: false}} >
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="DisplayScreen" component={DisplayScreen} />
       </Stack.Navigator>
@@ -45,6 +46,7 @@ const AuthStack = () => {
     return (
       <Stack.Navigator initialRouteName="BookingsScreen" screenOptions={{headerShown: false}} >
         <Stack.Screen name="BookingsScreen" component={BookingsScreen} />
+      
       </Stack.Navigator>
     );
   }

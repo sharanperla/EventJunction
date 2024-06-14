@@ -1,10 +1,18 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { StyleSheet, FlatList, Image, ImageBackground, Text, View, Dimensions } from 'react-native';
+import { StyleSheet, FlatList, Image, ImageBackground, Text, View, Dimensions, Pressable } from 'react-native';
 
 export function HomeCourosel({ data }) {
+  const navigation = useNavigation();
   const windowWidth = Dimensions.get('window').width;
+  const handleNavigate = (item) => {
+    console.log('pressed')
+    navigation.navigate('DisplayScreen', { data: item });
+  };
+
   return (
     <View style={styles.container}>
+        {data?.length > 0 && (
       
       <FlatList
       contentContainerStyle={styles.flatListContent}
@@ -12,23 +20,25 @@ export function HomeCourosel({ data }) {
         data={data}
         showsHorizontalScrollIndicator={false}
         renderItem={({ item }) => (
-          <View style={styles.coroselContainer}>
-            <ImageBackground
+          <Pressable style={styles.coroselContainer} key={item.eventId || Math.random()} onPress={() => handleNavigate(item)}>
+            <ImageBackground  
               source={{ uri: item.EventImage }}
               style={styles.CouroselImage}
+             
             >
               <View style={styles.overlay} />
-              <View style={styles.CouroselDetails}>
+              <View style={styles.CouroselDetails} >
                 <Text style={styles.CouroselName}>{item.eventName}</Text>
                 <Text style={styles.CouroselPlace}>{item.eventDesc}</Text>
               </View>
             </ImageBackground>
-          </View>
+          </Pressable>
         )}
         snapToAlignment="center" // Snap to center of the next item
         snapToInterval={windowWidth-20}
         decelerationRate={0.5} // Adjust deceleration rate if needed
       />
+      )}
     </View>
   );
 }
