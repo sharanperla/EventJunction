@@ -3,6 +3,7 @@ import React, { createContext, useState } from "react";
 export const EventContext = createContext();
 
 export const EventProvider = ({ children }) => {
+
   const [isEventLoading, setIsEventLoading] = useState(false);
   const [eventData, setEventData] = useState({});
   const [globalError, setGlobalError] = useState(null);

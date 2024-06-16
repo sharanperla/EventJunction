@@ -37,3 +37,29 @@ export const signin= async(req,res,next)=>{
        next(error)
     }
 }
+export const addInterests= async(req,res,next)=>{
+    const { userId, selectedInterests } = req.body;  // Extract userId and interests from request body
+
+let interests=selectedInterests
+let _id=userId;
+    if (!Array.isArray(selectedInterests)) {
+        return res.status(400).json({ error: 'Interests must be an array of strings' });
+    }
+
+    try {
+        // Find the user by ID and update interests
+        const user = await User.findByIdAndUpdate(
+            _id,
+            { interests },
+            { new: true, runValidators: true } // Return the updated document and run schema validators
+        );
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.status(200).json({ message: 'Interests updated successfully', user });
+    } catch (error) {
+        next(error); // Pass the error to the error handling middleware
+    }
+}

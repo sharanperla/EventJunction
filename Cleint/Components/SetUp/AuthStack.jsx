@@ -14,6 +14,7 @@ import MyEventsScreen from "../Screens/MyEventsScreen";
 import DisplayScreen from "../Screens/DisplayScreen";
 
 import RegiSuccessScreen from "../Screens/RegiSuccessScreen";
+import IntrestsScreen from "../Screens/IntrestsScreen";
 
 
 const AuthStack = () => {
@@ -26,6 +27,7 @@ const AuthStack = () => {
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="DisplayScreen" component={DisplayScreen} />
         <Stack.Screen name="RegisterationScreen" component={RegiSuccessScreen} />
+        <Stack.Screen name="Interests" component={IntrestsScreen} />
       </Stack.Navigator>
     );
   }

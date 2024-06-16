@@ -14,7 +14,7 @@ const AppStack = () => {
     initialRouteName="onBoarding"
     >
     <Stack.Screen name="OnBoarding" component={SplashScreen} />
-    <Stack.Screen name="Intrests" component={IntrestsScreen} />
+    {/* <Stack.Screen name="Intrests" component={IntrestsScreen} /> */}
     <Stack.Screen name="SignIn" component={SignInScreen} />
     <Stack.Screen name="SignUp" component={SignUpScreen} />
     </Stack.Navigator>

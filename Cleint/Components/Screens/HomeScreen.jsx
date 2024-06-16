@@ -1,4 +1,4 @@
-import React ,{useState,useEffect} from 'react'
+import React ,{useState,useEffect, useContext} from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Header from '../utils/Header'
@@ -6,13 +6,20 @@ import HomeCourosel from '../utils/HomeCourosel';
 import Slider1 from '../utils/Slider1';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useFocusEffect } from '@react-navigation/native';
+import { AuthContext } from '../../Context/AuthContext';
 
 
 
 function HomeScreen({navigation}) {
-  
 
- 
+  const {userData}=useContext(AuthContext);
+
+  useEffect(() => {
+    if (!userData.user.interests || userData.user.interests.length === 0) {
+      navigation.navigate('Interests');
+    }
+  }, []);
+
 
 
   const [getEventsError,setGetEventsError]=useState(false);
