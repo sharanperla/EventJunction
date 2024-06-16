@@ -1,3 +1,4 @@
+import Bookings from "../Models/bookings.model.js";
 import Event from "../Models/event.model.js";
 import { errorHandler } from "../utils/errorHandler.js";
 
@@ -77,3 +78,19 @@ export const updateLike = async (req, res, next) => {
     next(error);
   }
 };
+
+
+export const bookEvent=async(req,res,next)=>{
+  try {
+    const { _id, userId } = req.body;
+    const eventId=_id;
+    const userRef=userId;
+    const bookingData = { eventId, userRef };
+
+    const events = await Bookings.create(bookingData);
+    return res.status(201).json(events);
+  } catch (error) {
+    next(error);
+  }
+
+}

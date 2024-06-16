@@ -22,7 +22,7 @@ export function Slider2({data, name }){
             <ImageBackground
               source={{ uri: item.EventImage }}
               style={styles.Slider1Image}
-              resizeMode="contain"
+              resizeMode="cover"
             >
               <View style={styles.overlay} />
               <View style={styles.SliderDetails}>

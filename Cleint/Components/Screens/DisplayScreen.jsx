@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { Component, useContext, useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthContext } from "../../Context/AuthContext";
@@ -19,7 +19,7 @@ const DisplayScreen = ({route,navigation}) => {
   
   const [liked,setLiked]=useState(eventData.likedBy.includes(userData.user._id));
   const [likedCount,setLikedCount]=useState(eventData.Likes);
-  console.log("likeCount",likedCount)
+  console.log("eventdata",userData)
  
 
   const userId=userData.user._id;
@@ -53,6 +53,46 @@ const DisplayScreen = ({route,navigation}) => {
     }
   
   }
+
+
+  const handleRegister=async()=>{
+    console.log("pressed");
+    try {
+      const res=await fetch(`http://192.168.43.4:3000/api/event/register`,{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+        },
+        body: JSON.stringify({...eventData,userId}),
+      });
+      const data= await res.json();
+      
+      if(data.success===false)
+      {
+        console.log('error in  registering',data)
+        return
+  
+      }
+  
+      navigation.navigate("RegisterationScreen",{eventData})
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  const handleConfirm = () => {
+    Alert.alert(
+      "Confirmation",
+      `Are you sure you want to register for  this event?`,
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Action canceled"),
+          style: "cancel"
+        },
+        { text: "OK", onPress: () => handleRegister() }
+      ]
+    );
+  };
 
   
 
@@ -123,13 +163,11 @@ const DisplayScreen = ({route,navigation}) => {
   Entertainment
             </Text>
            </View>
-           <Text style={styles.para1}>Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus atque non eaque et laborum iste blanditiis! Nulla accusantium autem possimus accusamus ut voluptatum iusto a earum! Saepe, ducimus recusandae. Soluta. </Text>
-           <Text style={styles.para1}>Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus atque non eaque et laborum iste blanditiis! Nulla accusantium autem possimus accusamus ut voluptatum iusto a earum! Saepe, ducimus recusandae. Soluta. </Text>
-           <Text style={styles.para1}>Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus atque non eaque et laborum iste blanditiis! Nulla accusantium autem possimus accusamus ut voluptatum iusto a earum! Saepe, ducimus recusandae. Soluta. </Text>
-           <Text style={styles.para1}>Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus atque non eaque et laborum iste blanditiis! Nulla accusantium autem possimus accusamus ut voluptatum iusto a earum! Saepe, ducimus recusandae. Soluta. </Text>
+           <Text style={styles.para1}>{eventData.eventDesc}</Text>
+           
            <View style={{justifyContent:'center',alignItems:'center'}}>
 
-          <Text style={styles.SplashButton} >Join Event</Text>
+          <Text style={styles.SplashButton} onPress={handleConfirm} >Join Event</Text>
            </View>
           
           </View>

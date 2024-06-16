@@ -13,6 +13,8 @@ import EventSuccessScreen from "../Screens/EventSucessScreen";
 import MyEventsScreen from "../Screens/MyEventsScreen";
 import DisplayScreen from "../Screens/DisplayScreen";
 
+import RegiSuccessScreen from "../Screens/RegiSuccessScreen";
+
 
 const AuthStack = () => {
   const Stack = createStackNavigator();
@@ -23,6 +25,7 @@ const AuthStack = () => {
       <Stack.Navigator initialRouteName="HomeScreen" screenOptions={{headerShown: false}} >
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="DisplayScreen" component={DisplayScreen} />
+        <Stack.Screen name="RegisterationScreen" component={RegiSuccessScreen} />
       </Stack.Navigator>
     );
   }
@@ -46,6 +49,7 @@ const AuthStack = () => {
     return (
       <Stack.Navigator initialRouteName="BookingsScreen" screenOptions={{headerShown: false}} >
         <Stack.Screen name="BookingsScreen" component={BookingsScreen} />
+
       
       </Stack.Navigator>
     );
