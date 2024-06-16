@@ -5,12 +5,12 @@ import Header from '../utils/Header'
 import HomeCourosel from '../utils/HomeCourosel';
 import Slider1 from '../utils/Slider1';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 
-
-function HomeScreen() {
-
+function HomeScreen({navigation}) {
+  
 
  
 
@@ -46,6 +46,12 @@ function HomeScreen() {
     getDanceEvents();
   }, [])
 
+  useFocusEffect(
+    React.useCallback(() => {
+      getEvents();
+    getDanceEvents();
+    }, [])
+  );
   //genere=dance
   const getDanceEvents=async ()=>{
     try {

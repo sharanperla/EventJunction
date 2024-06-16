@@ -43,3 +43,37 @@ export const getAllEvents = async (req, res, next) => {
     console.log(error);
   }
 };
+
+export const updateLike = async (req, res, next) => {
+  try {
+    const userId =req.body.userId;
+    const eventId = req.params.id;
+    console.log(eventId)
+ 
+
+    // Find the event to check if the user has already liked it
+    const event = await Event.findById(eventId);
+
+    if (!event) {
+      return res.status(404).json("Event not found");
+    }
+
+    const hasLiked = event.likedBy.includes(userId);
+
+    let update;
+    if (hasLiked) {
+      if (event.Likes > 0) {
+        update = { $pull: { likedBy: userId }, $inc: { Likes: -1 } }; // Unlike
+      } else {
+        return res.status(400).json("Cannot unlike. Likes count already zero.");
+      }
+    } else {
+      update = { $addToSet: { likedBy: userId }, $inc: { Likes: 1 } }; // Like
+    }
+    const updatedEvent = await Event.findByIdAndUpdate(eventId, update, { new: true });
+
+    res.status(200).json(updatedEvent);
+  } catch (error) {
+    next(error);
+  }
+};

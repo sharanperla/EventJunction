@@ -1,17 +1,61 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { Component } from "react";
+import React, { Component, useContext, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { AuthContext } from "../../Context/AuthContext";
 
 const DisplayScreen = ({route,navigation}) => {
-
+  const {userData}=useContext(AuthContext)
+  // const [newEventData,setNewEventData]=useState(null);
+  
+  
   const eventData = route.params?.data;
+  
   if (!route) {
     // Handle cases where data is missing (e.g., display an error message)
     return <Text>Error: Event data not found!</Text>;
   }
-  console.log('data to display',eventData)
+  
+  const [liked,setLiked]=useState(eventData.likedBy.includes(userData.user._id));
+  const [likedCount,setLikedCount]=useState(eventData.Likes);
+  console.log("likeCount",likedCount)
+ 
+
+  const userId=userData.user._id;
+
+  const handleLikes = async ()=>{
+    try {
+     
+      const res=await fetch(`http://192.168.43.4:3000/api/event/Like/${eventData._id}`,{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+        },
+        body: JSON.stringify({userId}),
+      });
+      const data= await res.json();
+      
+      if(data.success===false)
+      {
+        console.log('error at liking',data)
+        return
+  
+      }
+      console.log("liked",data);
+      setLikedCount(data.Likes)
+      
+      setLiked(data.likedBy.includes(userData.user._id))
+  
+    } catch (error) {
+      console.log(error);
+      
+    }
+  
+  }
+
+  
+
 
   return (
     <SafeAreaView>
@@ -23,7 +67,11 @@ const DisplayScreen = ({route,navigation}) => {
             }}
         />
             <Ionicons name="arrow-back-outline" style={styles.backButton} onPress={()=>navigation.goBack()} size={30} /> 
-            <Ionicons name="heart-outline" style={styles.heart} onPress={()=>navigation.goBack()} size={30} /> 
+            <View style={styles.heart}>
+           {eventData.Likes>0 && liked? <Ionicons name="heart"   onPress={()=>handleLikes()} size={30} />:<Ionicons name="heart-outline"   onPress={()=>handleLikes()} size={30} />} 
+             <Text >{likedCount}</Text>
+            </View>
+
 
         <View style={styles.innerContainer}>
           <View style={styles.priceSlip}>
@@ -192,5 +240,11 @@ const styles = StyleSheet.create({
     right:10,
     backgroundColor:"#D9D9D9",
     borderRadius:10,
+    justifyContent:'center',
+    alignItems:'center',
+  },
+  heartText:{
+    fontSize:1,
+    color:'red'
   }
 });

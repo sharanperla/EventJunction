@@ -41,6 +41,14 @@ const eventSchema=new mongoose.Schema({
     EventImage:{
         type:String,
     },
+    Likes:{
+        type:Number,
+        default:0,
+    },
+    likedBy: {
+        type: [mongoose.Schema.Types.ObjectId], // Array of ObjectIds for users who liked
+        default: [], // Initialize likedBy as an empty array
+      },
 },{timestamps:true});
  
 const Event= mongoose.model('Event',eventSchema);

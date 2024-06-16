@@ -29,7 +29,7 @@ export function HomeCourosel({ data }) {
               <View style={styles.overlay} />
               <View style={styles.CouroselDetails} >
                 <Text style={styles.CouroselName}>{item.eventName}</Text>
-                <Text style={styles.CouroselPlace}>{item.eventDesc}</Text>
+                <Text style={styles.CouroselPlace}>{item.eventGenere}</Text>
               </View>
             </ImageBackground>
           </Pressable>

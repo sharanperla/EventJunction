@@ -120,6 +120,7 @@ export default function AddEvent({navigation}) {
       place: formData.place ? formData.place : "Location not selected",
       eventLocation: formData.eventLocation ? formData.eventLocation : null,
       EventImage: formData.EventImage ? formData.EventImage : null,
+      Likes:0,
     };
     try {
       createEventStart();
