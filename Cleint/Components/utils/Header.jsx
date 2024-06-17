@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     // borderBottomRightRadius: 40,
     paddingBottom: 20,
     display: "flex",
-    backgroundColor: color.primarycolor,
+    backgroundColor: "rgb(0,150,240)",
     gap: 25,
   },
   logoimage: {

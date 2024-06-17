@@ -10,29 +10,21 @@ import IntrestsScreen from "./Components/Screens/IntrestsScreen";
 
 import AppNav from "./Navigation/AppNav";
 import { AuthProvider } from "./Context/AuthContext";
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { EventProvider } from "./Context/EventContext";
 
 import { useEffect } from "react";
 
-
 export default function App() {
- 
- 
   return (
     <>
-    <AuthProvider>
-    <EventProvider>
-       
-        <GestureHandlerRootView style={{ flex: 1 }}>
-         
-
-          <AppNav/>
-    
+      <AuthProvider>
+        <EventProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <AppNav />
           </GestureHandlerRootView>
-       
-    </EventProvider>
-    </AuthProvider>
+        </EventProvider>
+      </AuthProvider>
     </>
   );
 }

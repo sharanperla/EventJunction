@@ -6,10 +6,10 @@ import { AuthContext } from "../../Context/AuthContext";
 const interestsData = [
   { id: 1, name: 'Music', image: require("../../assets/Intrests/music.png") },
   { id: 2, name: 'Art', image: require("../../assets/Intrests/music.png") },
-  { id: 3, name: 'Sports', image: require("../../assets/Intrests/music.png") },
-  { id: 4, name: 'Travel', image: require("../../assets/Intrests/music.png") },
-  { id: 5, name: 'Reading', image: require("../../assets/Intrests/music.png") },
-  { id: 6, name: 'Cooking', image: require("../../assets/Intrests/music.png") }
+  { id: 3, name: 'Dance', image: require("../../assets/Intrests/music.png") },
+  { id: 4, name: 'Drama', image: require("../../assets/Intrests/music.png") },
+  { id: 5, name: 'Sports', image: require("../../assets/Intrests/music.png") },
+  { id: 6, name: 'Other', image: require("../../assets/Intrests/music.png") }
 ];
 function IntrestsScreen({navigation}) {
 

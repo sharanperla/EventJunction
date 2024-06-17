@@ -49,7 +49,7 @@ function SignUpScreen({ navigation }) {
         console.log("doesnt match password");
         return;
       }
-      
+
       const res = await fetch("http://192.168.43.4:3000/api/auth/signup", {
         method: "POST",
         headers: {
@@ -57,9 +57,9 @@ function SignUpScreen({ navigation }) {
         },
         body: JSON.stringify(restFormData),
       });
-      
+
       const data = await res.json();
-      
+
       console.log(data);
       if (data.success === false) {
         setError(data.message);
@@ -82,8 +82,7 @@ function SignUpScreen({ navigation }) {
     <SafeAreaView>
       <View style={styles.Container}>
         <View style={styles.subContainer}>
-          <View  
-              style={styles.LogoContainer}>
+          <View style={styles.LogoContainer}>
             <Image source={require("../../assets/EJBlack.png")} />
             <Text style={styles.LogoCap}>Event Junction</Text>
           </View>
@@ -115,15 +114,12 @@ function SignUpScreen({ navigation }) {
             />
           </View>
           {passMatch === false ? <Text>password doesnt match</Text> : ""}
-          <Pressable
-            onPress={
-              handleSubmit}
-          >
+          <Pressable onPress={handleSubmit}>
             <Text style={styles.SplashButton}>
               {loading ? "Loading.." : "SignUp"}
             </Text>
           </Pressable>
-          <Text style={styles.errorMsg}>{error? error:''}</Text>
+          <Text style={styles.errorMsg}>{error ? error : ""}</Text>
         </View>
         <View style={styles.subContainer3}>
           <Text>
@@ -139,9 +135,10 @@ function SignUpScreen({ navigation }) {
 }
 
 export default SignUpScreen;
+
 const styles = StyleSheet.create({
   Container: {
-    height: "100%",
+    // height: "100%",
     paddingVertical: 20,
     display: "flex",
     justifyContent: "space-between",
@@ -160,10 +157,10 @@ const styles = StyleSheet.create({
   },
   inputStyle: {
     width: 300,
-        paddingHorizontal: 11,
-        paddingVertical: 10,
-        borderRadius: 10,
-        borderWidth:1,
+    paddingHorizontal: 11,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1,
   },
   SplashButton: {
     color: "#fff",
@@ -199,9 +196,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 15,
   },
-  errorMsg:{
-      color:'red',
-      maxWidth:'80%',
-      textAlign:'center'
-  }
+  errorMsg: {
+    color: "red",
+    maxWidth: "80%",
+    textAlign: "center",
+  },
 });

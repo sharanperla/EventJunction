@@ -50,6 +50,7 @@ function HomeScreen({navigation}) {
   const [getEventsError,setGetEventsError]=useState(false);
   const [allEvents,setAllEvents]=useState(false);
   const [danceEvents,setDanceEvents]=useState({});
+  const [interestedEvents,setInterestedEvents]=useState([]);
   
   //allEvents
   
@@ -77,6 +78,7 @@ function HomeScreen({navigation}) {
   useEffect(() => {
     getEvents();
     getDanceEvents();
+    getInterestEevents();
    
  
   }, [])
@@ -85,7 +87,7 @@ function HomeScreen({navigation}) {
     React.useCallback(() => {
       getEvents();
     getDanceEvents();
-    console.log(userData.user.interests.length)
+    getInterestEevents()
     if (!userData.user.interests || userData.user.interests.length === 0) {
       navigation.navigate('Interests');
       return 
@@ -114,6 +116,29 @@ function HomeScreen({navigation}) {
     }
     
   }
+  const getInterestEevents=async ()=>{
+    try {
+      setGetEventsError(false)
+      const res=await fetch(`http://192.168.43.4:3000/api/event/getEvents?genre=${userData.user.interests}`)
+     
+      const data=await res.json();
+      if(data.success===false)
+      {
+      
+        setGetEventsError(true)
+        console.log(data)
+        return;
+      }
+      setInterestedEvents(data)
+      console.log("interested events",interestedEvents)
+      
+      // console.log(allEvents)
+    } catch (error) {
+      setGetEventsError(true)
+      console.log(error)
+    }
+    
+  }
 
 
   // console.log(allEvents)
@@ -127,9 +152,9 @@ function HomeScreen({navigation}) {
        <View style={styles.container} >
        <HomeCourosel data={allEvents} />
        
-       <Slider1 data={allEvents} name={"Recomended for you"}/>
+       {interestedEvents.length>0&&<Slider1 data={interestedEvents} name={"Recommended"}/>}
+       <Slider1 data={allEvents} name={"Special"}/>
        <Slider1 data={danceEvents} name={"Dance"}/>
-       
 
        </View>
       

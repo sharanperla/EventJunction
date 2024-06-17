@@ -16,54 +16,57 @@ import DisplayScreen from "../Screens/DisplayScreen";
 import RegiSuccessScreen from "../Screens/RegiSuccessScreen";
 import IntrestsScreen from "../Screens/IntrestsScreen";
 
-
 const AuthStack = () => {
   const Stack = createStackNavigator();
   const Tab = createBottomTabNavigator();
-  
+
   function HomeStack() {
     return (
-      <Stack.Navigator initialRouteName="HomeScreen" screenOptions={{headerShown: false}} >
+      <Stack.Navigator
+        initialRouteName="HomeScreen"
+        screenOptions={{ headerShown: false }}
+      >
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="DisplayScreen" component={DisplayScreen} />
-        <Stack.Screen name="RegisterationScreen" component={RegiSuccessScreen} />
+        <Stack.Screen
+          name="RegisterationScreen"
+          component={RegiSuccessScreen}
+        />
         <Stack.Screen name="Interests" component={IntrestsScreen} />
       </Stack.Navigator>
     );
   }
 
-
   function ProfileStack() {
     return (
-      <Stack.Navigator initialRouteName="ProfileScreen" screenOptions={{headerShown: false}} >
+      <Stack.Navigator
+        initialRouteName="ProfileScreen"
+        screenOptions={{ headerShown: false }}
+      >
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
         <Stack.Screen name="AddEventScreen" component={AddEvent} />
-        <Stack.Screen name="EventSuccessScreen" component={EventSuccessScreen} />
+        <Stack.Screen
+          name="EventSuccessScreen"
+          component={EventSuccessScreen}
+        />
         <Stack.Screen name="MyEventsScreen" component={MyEventsScreen} />
-    
       </Stack.Navigator>
     );
   }
-
 
   function BookingStack() {
     return (
-      <Stack.Navigator initialRouteName="BookingsScreen" screenOptions={{headerShown: false}} >
+      <Stack.Navigator
+        initialRouteName="BookingsScreen"
+        screenOptions={{ headerShown: false }}
+      >
         <Stack.Screen name="BookingsScreen" component={BookingsScreen} />
-
-      
       </Stack.Navigator>
     );
   }
 
-
-
-
   return (
-  
-
-  
     <Tab.Navigator
       screenOptions={{
         headerShown: false,

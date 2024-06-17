@@ -298,9 +298,12 @@ export default function AddEvent({navigation}) {
                 placeholder={{ label: "Select an option...", value: null }}
                 onValueChange={(value) => handleChange("eventGenere", value)}
                 items={[
-                  { label: "Comedy", value: "Comedy" },
+                  { label: "Music", value: "Music" },
+                  { label: "Art", value: "Art" },
                   { label: "Dance", value: "Dance" },
-                  { label: "DJ", value: "DJ" },
+                  { label: "Drama", value: "Drama" },
+                  { label: "Sports", value: "Sports" },
+                  { label: "Other", value: "Other" },
                 ]}
                 value={formData.eventGenere ? formData.eventGenere : ""}
               />

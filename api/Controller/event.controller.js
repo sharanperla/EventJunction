@@ -24,10 +24,12 @@ export const getAllEvents = async (req, res, next) => {
         filter.eventName = { $regex: searchTerm, $options: "i" }; // Case-insensitive by default
       }
     if (req.query.genre) {
+      console.log("interests",req.query.genre.split(","))
       const genres = req.query.genre.split(","); // Split comma-separated genres
       filter.eventGenere = { $in: genres }; // Filter by events with any of the genres
     }
     if (req.query.eventAmount) {
+      
         const specifiedAmount = parseInt(req.query.eventAmount);
         filter.eventAmount = { $lt: specifiedAmount }; // Filter for events less than specified amount
       }
@@ -40,8 +42,8 @@ export const getAllEvents = async (req, res, next) => {
 
     return res.status(200).json(events);
   } catch (error) {
-    next(error);
     console.log(error);
+    next(error);
   }
 };
 
