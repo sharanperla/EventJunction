@@ -13,7 +13,7 @@ const interestsData = [
 ];
 function IntrestsScreen({navigation}) {
 
-    const {userData}=useContext(AuthContext)
+    const {userData,setUserData}=useContext(AuthContext)
     const [selectedInterests, setSelectedInterests] = useState([]);
   
     const toggleInterest = (interestId) => {
@@ -47,6 +47,7 @@ function IntrestsScreen({navigation}) {
         }
     
         console.log("Success:", data);
+        setUserData(data);
         navigation.navigate("HomeScreen");
         // Handle success scenario, if needed
       } catch (error) {

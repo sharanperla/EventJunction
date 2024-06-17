@@ -12,21 +12,47 @@ import { AuthContext } from '../../Context/AuthContext';
 
 function HomeScreen({navigation}) {
 
-  const {userData}=useContext(AuthContext);
+  const {userData,setUserData}=useContext(AuthContext);
+  const [newUserData,setNewUserData]=useState({});
 
+  // const getUserData=async ()=>{
+  //   try {
+  //     // setGetEventsError(false)
+  //     const res=await fetch(`http://192.168.43.4:3000/api/user/getUserData/${userData.user._id}`)
+     
+  //     const data=await res.json();
+  //     if(data.success===false)
+  //     {
+      
+  //       // setGetEventsError(true)
+  //       console.log(data);
+  //       return;
+  //     }
+  //     setUserData({user:data[0]})
+
+  //     // console.log(allEvents)
+  //   } catch (error) {
+  //     // setGetEventsError(true)
+  //     console.log(error)
+  //   }
+    
+  // }
+  
+  
   useEffect(() => {
+    console.log(userData.user.interests.length)
     if (!userData.user.interests || userData.user.interests.length === 0) {
       navigation.navigate('Interests');
+      return 
     }
   }, []);
-
-
-
+  
   const [getEventsError,setGetEventsError]=useState(false);
   const [allEvents,setAllEvents]=useState(false);
   const [danceEvents,setDanceEvents]=useState({});
-
+  
   //allEvents
+  
 
   const getEvents=async ()=>{
     try {
@@ -51,12 +77,20 @@ function HomeScreen({navigation}) {
   useEffect(() => {
     getEvents();
     getDanceEvents();
+   
+ 
   }, [])
 
   useFocusEffect(
     React.useCallback(() => {
       getEvents();
     getDanceEvents();
+    console.log(userData.user.interests.length)
+    if (!userData.user.interests || userData.user.interests.length === 0) {
+      navigation.navigate('Interests');
+      return 
+    }
+
     }, [])
   );
   //genere=dance
@@ -73,6 +107,7 @@ function HomeScreen({navigation}) {
         return;
       }
       setDanceEvents(data)
+      
       // console.log(allEvents)
     } catch (error) {
       setGetEventsError(true)

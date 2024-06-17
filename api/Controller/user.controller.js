@@ -48,3 +48,23 @@ export const getUserEvents = async (req,res,next)=>{
     }
 
 }
+
+export const getUseraData = async (req,res,next)=>{
+  
+
+    if(req.params.id)
+    {
+        try {
+            
+            const userData =await User.find({_id:req.params.id})
+            res.status(200).json(userData)
+
+        } catch (error) {
+            next(error)
+        }
+
+    }else{
+        return next(errorHandler(401,'you can only update see your details'))
+    }
+
+}
