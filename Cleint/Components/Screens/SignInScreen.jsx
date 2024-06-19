@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 // import { useDispatch, useSelector } from 'react-redux';
 import { AuthContext } from "../../Context/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import color from "../../assets/color";
 
 function SignInScreen({ navigation }) {
   const {
@@ -108,7 +109,8 @@ const styles = StyleSheet.create({
   },
   SplashButton: {
     color: "#fff",
-    backgroundColor: "#F10EDB",
+    // backgroundColor: "#F10EDB",
+    backgroundColor: color.primaryColor,
     width: 300,
     paddingHorizontal: 11,
     paddingVertical: 14,

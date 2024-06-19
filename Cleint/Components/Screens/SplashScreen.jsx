@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { AuthContext } from "../../Context/AuthContext";
+import color from "../../assets/color";
 
 export default function SplashScreen({ navigation }) {
   handlePress = () => {
@@ -54,7 +55,8 @@ const styles = StyleSheet.create({
   },
   SplashButton: {
     color: "#fff",
-    backgroundColor: "rgb(0,120,240)",
+    // backgroundColor: "rgb(0,120,240)",
+    backgroundColor: color.primaryColor,
     // backgroundColor: "#F10EDB",
     width: 300,
     paddingHorizontal: 11,
@@ -66,7 +68,7 @@ const styles = StyleSheet.create({
   },
   image: {
     marginBottom: -20,
-    tintColor: "rgb(0,120,240)",
+    tintColor: color.primaryColor,
   },
   logoContainer: {
     justifyContent: "center",

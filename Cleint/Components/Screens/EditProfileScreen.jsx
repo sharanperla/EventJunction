@@ -20,6 +20,7 @@ import {app} from '../../fireBase/firebase.config'
 //instal npm install expo-image-picker
 import * as ImagePicker from 'expo-image-picker';
 import { AuthContext } from '../../Context/AuthContext';
+import color from '../../assets/color';
 
 
 export default function EditProfileScreen({navigation}){
@@ -276,6 +277,7 @@ const styles = StyleSheet.create({
       SplashButton: {
         color: "#fff",
         backgroundColor: "#F10EDB",
+        backgroundColor: color.primaryColor,
         width: 300,
         paddingHorizontal: 11,
         paddingVertical: 14,

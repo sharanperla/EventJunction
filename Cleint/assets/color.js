@@ -1,5 +1,6 @@
 const color = {
-  primarycolor: "rose",
+  primaryExtracolor: "rose",
+  primaryColor:"rgb(0,120,240)"
 };
 
 export default color;

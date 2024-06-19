@@ -83,7 +83,7 @@ export default function ProfileScreen({ navigation }) {
           <Ionicons name="information-circle-outline" size={30} />
           <Text>About us</Text>
         </View>
-        <Ionicons name="chevron-forward" size={30} onPress={toAddEvent} />
+        <Ionicons name="chevron-forward" size={30} onPress={()=>navigation.navigate("AboutUsScreen")} />
       </View>
 
       {/* <View style={styles.profileDataContainer}>

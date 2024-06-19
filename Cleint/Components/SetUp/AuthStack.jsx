@@ -15,6 +15,7 @@ import DisplayScreen from "../Screens/DisplayScreen";
 
 import RegiSuccessScreen from "../Screens/RegiSuccessScreen";
 import IntrestsScreen from "../Screens/IntrestsScreen";
+import AboutUsScreen from "../Screens/AboutUsScreen";
 
 const AuthStack = () => {
   const Stack = createStackNavigator();
@@ -51,6 +52,8 @@ const AuthStack = () => {
           component={EventSuccessScreen}
         />
         <Stack.Screen name="MyEventsScreen" component={MyEventsScreen} />
+        <Stack.Screen name="EditMyEventsScreen" component={MyEventsScreen} />
+        <Stack.Screen name="AboutUsScreen" component={AboutUsScreen} />
       </Stack.Navigator>
     );
   }

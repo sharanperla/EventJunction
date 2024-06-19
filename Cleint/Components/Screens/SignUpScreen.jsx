@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
+import color from "../../assets/color";
 
 function SignUpScreen({ navigation }) {
   navigateToSignUp = () => {
@@ -83,7 +84,7 @@ function SignUpScreen({ navigation }) {
       <View style={styles.Container}>
         <View style={styles.subContainer}>
           <View style={styles.LogoContainer}>
-            <Image source={require("../../assets/EJBlack.png")} />
+            <Image style={styles.Image} source={require("../../assets/EJBlack.png")} />
             <Text style={styles.LogoCap}>Event Junction</Text>
           </View>
           <View style={styles.SignUpdisc}>
@@ -164,7 +165,8 @@ const styles = StyleSheet.create({
   },
   SplashButton: {
     color: "#fff",
-    backgroundColor: "#F10EDB",
+    // backgroundColor: "#F10EDB",
+    backgroundColor: color.primaryColor,
     width: 300,
     paddingHorizontal: 11,
     paddingVertical: 14,
@@ -201,4 +203,7 @@ const styles = StyleSheet.create({
     maxWidth: "80%",
     textAlign: "center",
   },
+  Image:{
+    tintColor:color.primaryColor
+  }
 });
