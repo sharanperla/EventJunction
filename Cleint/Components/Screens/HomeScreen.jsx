@@ -1,5 +1,5 @@
 import React ,{useState,useEffect, useContext} from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Header from '../utils/Header'
 import HomeCourosel from '../utils/HomeCourosel';
@@ -50,36 +50,43 @@ function HomeScreen({navigation}) {
   const [getEventsError,setGetEventsError]=useState(false);
   const [allEvents,setAllEvents]=useState(false);
   const [danceEvents,setDanceEvents]=useState({});
+  const [musicEvents,setMusicEvents]=useState({});
   const [interestedEvents,setInterestedEvents]=useState([]);
+  const [loading,setLoading]=useState(false)
   
   //allEvents
   
 
   const getEvents=async ()=>{
     try {
+      setLoading(true)
       setGetEventsError(false)
       const res=await fetch(`http://192.168.43.4:3000/api/event/getEvents`)
      
       const data=await res.json();
       if(data.success===false)
       {
-      
+        setLoading(false)
         setGetEventsError(true)
+
         return;
       }
       setAllEvents(data)
+      setLoading(false)
       // console.log(allEvents)
     } catch (error) {
+      setLoading(false)
       setGetEventsError(true)
     }
     
   }
 
   useEffect(() => {
+
     getEvents();
     getDanceEvents();
     getInterestEevents();
-   
+    getMusicEvents()
  
   }, [])
 
@@ -88,6 +95,7 @@ function HomeScreen({navigation}) {
       getEvents();
     getDanceEvents();
     getInterestEevents()
+    getMusicEvents()
     if (!userData.user.interests || userData.user.interests.length === 0) {
       navigation.navigate('Interests');
       return 
@@ -98,42 +106,70 @@ function HomeScreen({navigation}) {
   //genere=dance
   const getDanceEvents=async ()=>{
     try {
+      setLoading(true)
       setGetEventsError(false)
       const res=await fetch(`http://192.168.43.4:3000/api/event/getEvents?genre=Dance`)
      
       const data=await res.json();
       if(data.success===false)
       {
-      
+        setLoading(false)
         setGetEventsError(true)
         return;
       }
       setDanceEvents(data)
+      setLoading(false)
+      // console.log(allEvents)
+    } catch (error) {
+      setLoading(false)
+      setGetEventsError(true)
+    }
+    
+  }
+  const getMusicEvents=async ()=>{
+    try {
+      setLoading(true)
+      setGetEventsError(false)
+      const res=await fetch(`http://192.168.43.4:3000/api/event/getEvents?genre=Music`)
+     
+      const data=await res.json();
+      if(data.success===false)
+      {
+        setLoading(false)
+        setGetEventsError(true)
+        return;
+      }
+      setLoading(false)
+      setMusicEvents(data)
       
       // console.log(allEvents)
     } catch (error) {
+      setLoading(false)
       setGetEventsError(true)
     }
     
   }
   const getInterestEevents=async ()=>{
     try {
+      setLoading(true)
       setGetEventsError(false)
       const res=await fetch(`http://192.168.43.4:3000/api/event/getEvents?genre=${userData.user.interests}`)
      
       const data=await res.json();
       if(data.success===false)
       {
-      
+        setLoading(false)
         setGetEventsError(true)
         console.log(data)
         return;
       }
       setInterestedEvents(data)
+      setLoading(false)
       console.log("interested events",interestedEvents)
       
       // console.log(allEvents)
     } catch (error) {
+      setLoading(false)
       setGetEventsError(true)
       console.log(error)
     }
@@ -145,7 +181,7 @@ function HomeScreen({navigation}) {
   
   return (
     <SafeAreaView >
-     
+     {loading?<View style={styles.spinner}><ActivityIndicator size="large" color="#0000ff" /></View>:
      <ScrollView>
        <Header/>
        
@@ -155,11 +191,12 @@ function HomeScreen({navigation}) {
        {interestedEvents.length>0&&<Slider1 data={interestedEvents} name={"Recommended"}/>}
        <Slider1 data={allEvents} name={"Special"}/>
        <Slider1 data={danceEvents} name={"Dance"}/>
+       <Slider1 data={musicEvents} name={"Music"}/>
 
        </View>
       
        </ScrollView>
-     
+     }
     </SafeAreaView>
   )
 }
@@ -170,6 +207,11 @@ const styles=StyleSheet.create({
   container:{
     paddingVertical:20,
   },
+  spinner:{
+    height:'100%',
+    justifyContent:'center',
+    alignItems:'center'
+  }
   
 });
 

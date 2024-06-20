@@ -2,6 +2,7 @@ import User from "../Models/user.model.js"
 import Event from "../Models/event.model.js"
 import { errorHandler } from "../utils/errorHandler.js"
 import bcryptjs from 'bcryptjs';
+import Bookings from "../Models/bookings.model.js";
 
 
 
@@ -58,7 +59,7 @@ export const getUseraData = async (req,res,next)=>{
             
             const userData =await User.find({_id:req.params.id})
             res.status(200).json(userData)
-
+         
         } catch (error) {
             next(error)
         }

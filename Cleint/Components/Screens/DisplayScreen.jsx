@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { Component, useContext, useState } from "react";
+import React, { Component, useContext, useEffect, useState } from "react";
 import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,10 +19,12 @@ const DisplayScreen = ({route,navigation}) => {
   
   const [liked,setLiked]=useState(eventData.likedBy.includes(userData.user._id));
   const [likedCount,setLikedCount]=useState(eventData.Likes);
+  const [participants,setParticipants]=useState({});
   console.log("eventdata",userData)
  
 
   const userId=userData.user._id;
+
 
   const handleLikes = async ()=>{
     try {
@@ -53,7 +55,7 @@ const DisplayScreen = ({route,navigation}) => {
     }
   
   }
-
+  const avatar=userData.user.avatar;
 
   const handleRegister=async()=>{
     console.log("pressed");
@@ -63,7 +65,7 @@ const DisplayScreen = ({route,navigation}) => {
         headers:{
           'Content-Type':'application/json',
         },
-        body: JSON.stringify({...eventData,userId}),
+        body: JSON.stringify({...eventData,userId,avatar}),
       });
       const data= await res.json();
       
@@ -94,6 +96,34 @@ const DisplayScreen = ({route,navigation}) => {
     );
   };
 
+  const getParticipants=async()=>{
+    try {
+      const res=await fetch(`http://192.168.43.4:3000/api/event/participants?id=${eventData._id}`)
+     
+      const data=await res.json();
+      if(data.success===false)
+      {
+        
+        setGetEventsError(true)
+        console.log('error',data)
+        return;
+      }
+      setParticipants(data.data)
+      console.log('******',participants);
+      
+      
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    getParticipants()
+
+    return () => {
+      
+    }
+  }, [])
   
 
 
@@ -122,30 +152,15 @@ const DisplayScreen = ({route,navigation}) => {
             <View style={styles.group1}>
                     <Text style={styles.priceLabel}>Participants</Text>
                     <View style={styles.participantsImgContainer}>
-                        <Image
+                      {(participants&&participants.length>0)&&participants.map((data)=>{
+                      
+                      return <Image
                         style={styles.participentsImg}
                         source={{
-                            uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s",
+                            uri: data.avatar?data.avatar:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s",
                         }}
-                        />
-                        <Image
-                        style={styles.participentsImg}
-                        source={{
-                            uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s",
-                        }}
-                        />
-                        <Image
-                        style={styles.participentsImg}
-                        source={{
-                            uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s",
-                        }}
-                        />
-                        <Image
-                        style={styles.participentsImg}
-                        source={{
-                            uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s",
-                        }}
-                        />
+                        />})}  
+                        
                     </View>
             </View>
           </View>

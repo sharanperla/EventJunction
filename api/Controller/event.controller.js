@@ -12,6 +12,7 @@ export const createEvent = async (req, res, next) => {
 };
 export const getAllEvents = async (req, res, next) => {
   try {
+    
     const limit = parseInt(req.query.limit) || 9;
     const startIndex = parseInt(req.query.startIndex) || 0;
 
@@ -84,10 +85,11 @@ export const updateLike = async (req, res, next) => {
 
 export const bookEvent=async(req,res,next)=>{
   try {
-    const { _id, userId } = req.body;
+    
+    const { _id, userId,avatar } = req.body;
     const eventId=_id;
     const userRef=userId;
-    const bookingData = { eventId, userRef };
+    const bookingData = { eventId, userRef ,avatar };
 
     const events = await Bookings.create(bookingData);
     return res.status(201).json(events);
@@ -96,3 +98,34 @@ export const bookEvent=async(req,res,next)=>{
   }
 
 }
+export const getParticipants = async (req, res, next) => {
+  if (req.query.id) {
+      try {
+          const eventsid = req.query.id;
+      
+          // Find bookings with the specified eventId
+          const bookings = await Bookings.find({eventId:eventsid}).limit(4).sort();
+  
+
+          if (!bookings || bookings.length === 0) {
+              return res.status(404).json({ message: "No participants found for this event" });
+          }
+           
+          const participants = bookings.map(booking => ({
+              userId: booking.userRef,
+              avatar:booking.avatar,
+              // Add any other user details you need from the booking
+              // For example: userName: booking.userName, userEmail: booking.userEmail, etc.
+          }));
+          console.log(participants)
+          res.status(200).json({
+              status: 'success',
+              data: participants
+          });
+      } catch (error) {
+          next(error);
+      }
+  } else {
+      res.status(400).json({ message: "Event ID is required" });
+  }
+};
