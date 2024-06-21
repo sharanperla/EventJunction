@@ -4,6 +4,8 @@ import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthContext } from "../../Context/AuthContext";
+import { Colors } from "react-native/Libraries/NewAppScreen";
+import color from "../../assets/color";
 
 const DisplayScreen = ({route,navigation}) => {
   const {userData}=useContext(AuthContext)
@@ -98,7 +100,7 @@ const DisplayScreen = ({route,navigation}) => {
 
   const getParticipants=async()=>{
     try {
-      const res=await fetch(`http://192.168.43.4:3000/api/event/participants?id=${eventData._id}`)
+      const res=await fetch(`http://192.168.43.4:3000/api/event/participants?id=${eventData._id}&userid=${userData.user._id}`)
      
       const data=await res.json();
       if(data.success===false)
@@ -109,13 +111,14 @@ const DisplayScreen = ({route,navigation}) => {
         return;
       }
       setParticipants(data.data)
-      console.log('******',participants);
+      console.log('******',participants[0]);
       
       
     } catch (error) {
       console.log(error)
     }
   }
+ 
 
   useEffect(() => {
     getParticipants()
@@ -155,6 +158,7 @@ const DisplayScreen = ({route,navigation}) => {
                       {(participants&&participants.length>0)&&participants.map((data)=>{
                       
                       return <Image
+                      key={data._id}
                         style={styles.participentsImg}
                         source={{
                             uri: data.avatar?data.avatar:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s",
@@ -182,7 +186,8 @@ const DisplayScreen = ({route,navigation}) => {
            
            <View style={{justifyContent:'center',alignItems:'center'}}>
 
-          <Text style={styles.SplashButton} onPress={handleConfirm} >Join Event</Text>
+          {/* <Text style={styles.SplashButton} onPress={handleConfirm} >{participants[0].register ?"registered":"Join Event"}</Text> */}
+          {/* <Text style={styles.SplashButton} onPress={handleConfirm} >Join Event</Text> */}
            </View>
           
           </View>
@@ -271,7 +276,8 @@ const styles = StyleSheet.create({
   SplashButton: {
     marginVertical:10,
     color: "#fff",
-    backgroundColor: "#F10EDB",
+    // backgroundColor: "#F10EDB",
+    backgroundColor:color.primaryColor,
     width: 300,
     paddingHorizontal: 11,
     paddingVertical: 14,

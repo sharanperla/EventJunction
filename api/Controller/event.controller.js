@@ -102,7 +102,7 @@ export const getParticipants = async (req, res, next) => {
   if (req.query.id) {
       try {
           const eventsid = req.query.id;
-      
+          const userId=req.query.userid;
           // Find bookings with the specified eventId
           const bookings = await Bookings.find({eventId:eventsid}).limit(4).sort();
   
@@ -110,10 +110,11 @@ export const getParticipants = async (req, res, next) => {
           if (!bookings || bookings.length === 0) {
               return res.status(404).json({ message: "No participants found for this event" });
           }
-           
+           console.log(bookings)
           const participants = bookings.map(booking => ({
               userId: booking.userRef,
               avatar:booking.avatar,
+              register: booking.userRef.toString() === userId  ? true : false
               // Add any other user details you need from the booking
               // For example: userName: booking.userName, userEmail: booking.userEmail, etc.
           }));
@@ -127,5 +128,54 @@ export const getParticipants = async (req, res, next) => {
       }
   } else {
       res.status(400).json({ message: "Event ID is required" });
+  }
+};
+
+export const getUserEvents = async (req, res, next) => {
+  if (req.query.id) {
+    try {
+      const userId = req.query.id;
+      const limit = parseInt(req.query.limit) || 10; 
+      const skip= parseInt(req.query.skip) || 0; 
+
+      // Find bookings with the specified userId
+      const bookings = await Bookings.find({ userRef: userId });
+
+      if (!bookings || bookings.length === 0) {
+        return res.status(404).json({ message: "No events found for this user" });
+      }
+
+      // Extract event IDs from the bookings
+      const eventIds = bookings.map(booking => booking.eventId);
+
+      // Find event details using the event IDs
+      const events = await Event.find({ _id: { $in: eventIds } }).skip(skip).sort({eDate:1}).limit(limit);
+      console.log(events)
+      // Prepare the response data
+      const responseData = events.map(event => ({
+        eventId: event._id,
+        eventName: event.eventName,
+        eventDesc: event.eventDesc,
+        place:event.place,
+        EventImage:event.EventImage,
+        eventAmount:event.eventAmount,
+        likedBy: event.likedBy,
+        eventGenere:event.eventGenere,
+        eDate:event.eDate,
+
+        
+
+        // Add any other event details you need from the event
+      }));
+
+      res.status(200).json({
+        status: 'success',
+        data: responseData
+      });
+    } catch (error) {
+      next(error);
+    }
+  } else {
+    res.status(400).json({ message: "User ID is required" });
   }
 };
