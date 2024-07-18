@@ -11,12 +11,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthContext } from "../../Context/AuthContext";
 import { ScrollView } from "react-native-gesture-handler";
 import color from "../../assets/color";
+import { useFocusEffect } from "@react-navigation/native";
 
 function MyEventsScreen({navigation}) {
   const [showListingError, setShowListingError] = useState(false);
   const [userListing, setUserListing] = useState(false);
   const { userData } = useContext(AuthContext);
-  console.log(userListing);
+
+  
+  console.log('data',userData);
   const handleShowListing = async () => {
     try {
       setShowListingError(false);
@@ -34,6 +37,13 @@ function MyEventsScreen({navigation}) {
       setShowListingError(true);
     }
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      handleShowListing()
+
+    }, [])
+  );
 
   useEffect(() => {
     handleShowListing();
@@ -82,11 +92,11 @@ function MyEventsScreen({navigation}) {
                   }} // Use user's avatar if available, otherwise use default
                   style={styles.Slider1Image}
                 >
-                  <View style={styles.overlay} />
                   <View style={styles.SliderDetails}>
+                  <View style={styles.overlay} />
                     <Text style={styles.SliderName}>{user.eventName}</Text>
                     <Text style={styles.SliderPlace}>{user.eventGenere} || {user.place}</Text>
-                    <Text style={styles.SliderPlace} numberOfLines={2}>{user.eventDesc}</Text>
+                    {/* <Text style={styles.SliderPlace} numberOfLines={2}>{user.eventDesc}</Text> */}
                   </View>
                 
                 </ImageBackground>

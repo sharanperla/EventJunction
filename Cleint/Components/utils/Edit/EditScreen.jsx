@@ -1,3 +1,5 @@
+import { AuthContext } from "../../../Context/AuthContext.js";
+import { EventContext } from "../../../Context/EventContext.js";
 import React, { useContext, useEffect, useState } from "react";
 import { Button, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, Platform, ScrollView, Pressable, Image } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
@@ -8,14 +10,26 @@ import { Ionicons } from "@expo/vector-icons";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import RNPickerSelect from "react-native-picker-select";
-import { EventContext } from "../../Context/EventContext.js";
-import { AuthContext } from "../../Context/AuthContext.js";
+
 import * as ImagePicker from 'expo-image-picker';
 import {getDownloadURL, getStorage, ref, uploadBytesResumable} from 'firebase/storage';
-import {app} from '../../fireBase/firebase.config.jsx'
+import {app} from '../../../fireBase/firebase.config.jsx';
 
-export default function AddEvent({navigation}) {
-  const { isEventLoading, setIsEventLoading, eventData, globalError, createEventStart, createEventSuccess, createEventFailure } = useContext(EventContext);
+// eDate: formData.eDate ? formData.eDate.dateString : null,
+//       eventAmount: formData.eventAmount ? formData.eventAmount : data.eventAmount,
+//       eventDesc: formData.eventDesc ? formData.eventDesc : data.eventDesc,
+//       eventGenere: formData.eventGenere ? formData.eventGenere : data.eventGenere,
+//       eventName: formData.eventName ? formData.eventName : data.eventName,
+//       place: formData.place ? formData.place : "Location not selected",
+//       eventLocation: formData.eventLocation ? formData.eventLocation : data.eventLocation,
+//       EventImage: formData.EventImage ? formData.EventImage : data.EventImage,
+//       Likes:0,
+
+
+export default function EditScreen({route,navigation}) {
+  const data=route.params.data;
+  console.log(data._id);
+  const { isEventLoading, setIsEventLoading, eventData, globalError, editEventStart, editEventSuccess, editEventFailure} = useContext(EventContext);
   const {userData } = useContext(AuthContext);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isMapVisible, setIsMapVisible] = useState(false);
@@ -24,10 +38,11 @@ export default function AddEvent({navigation}) {
   const [fileperc,setFileperc]=useState(0);
   const [fileUploadError,setFileUploadError]=useState(null);
   const [place, setPlace] = useState(null);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState(data);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [locPermission, setLocPermission] = useState();
   const [fileUploadActive,setFileUploadActive]=useState(false)
+  const [success,setSuccess]=useState(false)
 
 
   useEffect(() => {
@@ -37,7 +52,7 @@ export default function AddEvent({navigation}) {
       fetch(apiUrl)
         .then((response) => response.json())
         .then((data) => {
-          // console.log("Address:", data);
+          
           setPlace(data.display_name);
         })
         .catch((error) => {
@@ -45,6 +60,7 @@ export default function AddEvent({navigation}) {
         });
     }
   }, [selectedLocation]);
+
 
   const handleMapPress = (event) => {
     const newLocation = {
@@ -77,7 +93,7 @@ export default function AddEvent({navigation}) {
       ...formData,
       [key]: value,
     });
-    // console.log("formDAta", formData);
+  
   };
 
   useEffect(() => {
@@ -89,7 +105,7 @@ export default function AddEvent({navigation}) {
       }
       const location = await Location.getCurrentPositionAsync({});
       setLocPermission(location);
-      // console.log("User location:", location.coords);
+   
     })();
   }, []);
 
@@ -105,12 +121,6 @@ export default function AddEvent({navigation}) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationError = validateForm();
-    if (validationError) {
-      createEventFailure(validationError);
-      return;
-    }
-    
     const formattedData = {
       eDate: formData.eDate ? formData.eDate.dateString : null,
       eventAmount: formData.eventAmount ? formData.eventAmount : null,
@@ -119,38 +129,49 @@ export default function AddEvent({navigation}) {
       eventName: formData.eventName ? formData.eventName : null,
       place: formData.place ? formData.place : "Location not selected",
       eventLocation: formData.eventLocation ? formData.eventLocation : null,
-      EventImage: formData.EventImage ? formData.EventImage : null,
-      Likes:0,
+      EventImage: formData.EventImage ? formData.EventImage : "",
     };
+    
     try {
-      createEventStart();
-      const res = await fetch("http://192.168.43.4:3000/api/event/create", {
-        method: "POST",
+      setSuccess(false)
+      editEventStart();
+      const res = await fetch(`http://192.168.43.4:3000/api/event/updateEvent/${data._id}`, {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formattedData,
-          userRef:userData.user._id
-        }),
+        body: JSON.stringify(formattedData),
       });
-
-      const data = await res.json();
-      // console.log(data);
-      if (data.success === false) {
-        createEventFailure(data.message);
-        console.log("data success false");
-        return;
+  
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.indexOf('application/json') !== -1) {
+        const responseData = await res.json();
+        
+        if (responseData.success === false) {
+          editEventFailure(responseData.message);
+          console.log('Error at success', responseData);
+          return;
+        }
+  
+        // Update the formData state with the updated event data from the server
+        setFormData(responseData.data); // Assuming responseData contains the updated event data
+        console.log("Form data submitted:", responseData);
+        setSuccess(true)
+        editEventSuccess(responseData.data);
+      } else {
+        const text = await res.text();
+        setSuccess(false)
+        console.error('Unexpected response format:', text);
+        editEventFailure('Unexpected response format');
       }
-      createEventSuccess(data);
-      navigation.navigate("EventSuccessScreen");
-      console.log("data success");
     } catch (error) {
-      createEventFailure(error.message);
-      console.log("error in submitting", error);
+      setSuccess(false)
+      console.log(error);
+      editEventFailure(error.message);
     }
-    // console.log("inside submit", formData);
   };
+  
+  
 
   const uploadImage = async (selectedImage) => {
     try {
@@ -204,7 +225,7 @@ export default function AddEvent({navigation}) {
         quality: 1,
       });
   
-      if (!result.cancelled) {
+      if (!result.canceled) {
         
         setSelectedImage(result.assets[0]);
           }
@@ -252,7 +273,7 @@ export default function AddEvent({navigation}) {
             />
 
             <TouchableOpacity style={styles.CalinputStyle} onPress={toggleModal}>
-              <TextInput placeholder="Select date" value={formData.eDate ? formData.eDate.dateString : ""} />
+              <TextInput placeholder="Select date" value={formData.eDate ? formData.eDate : ""} />
               <Ionicons name="calendar" size={30} />
               <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -264,7 +285,7 @@ export default function AddEvent({navigation}) {
               </Modal>
             </TouchableOpacity>
             <View style={styles.placeContainer}>
-              <TextInput style={styles.PlaceinputStyle} placeholder={place ? place : "Place"} />
+              <TextInput style={styles.PlaceinputStyle} placeholder={formData.place ? formData.place : "Place"} />
               <TouchableOpacity style={styles.mapButton} onPress={toggleMap}>
                 <Ionicons name="location-outline" size={30} />
                 <Modal isVisible={isMapVisible} onBackdropPress={toggleMap}>
@@ -279,7 +300,7 @@ export default function AddEvent({navigation}) {
                         longitudeDelta: 0.0421,
                       }}
                     >
-                      {selectedLocation && <Marker coordinate={selectedLocation} />}
+                      {selectedLocation?<Marker coordinate={selectedLocation}/>:<Marker coordinate={formData.eventLocation}/>}
                     </MapView>
                     <Button
                       title="Confirm Location"
@@ -312,16 +333,17 @@ export default function AddEvent({navigation}) {
             <View>
               <TextInput
                 style={styles.inputStyle}
+                placeholder="Enter Price amount in INR"
                 keyboardType="numeric"
                 onChangeText={(value) => handleChange("eventAmount", value)}
-                value={formData.eventAmount ? formData.eventAmount : ""}
-                placeholder="Enter Price amount in INR"
+                value={formData.eventAmount?formData.eventAmount.toString():""}
               />
             </View>
             <Pressable onPress={handleSubmit} disabled={isEventLoading}>
-              <Text style={styles.SplashButton}>{isEventLoading? "loading...":"create"}</Text>
+              <Text style={styles.SplashButton}>{isEventLoading? "loading...":"Update"}</Text>
             </Pressable>
             <Text style={styles.error}>{globalError?globalError:""}</Text>
+            <Text style={styles.success}>{success?"successfully updated":""}</Text>
           </View>
 
       </KeyboardAvoidingView>
@@ -422,6 +444,11 @@ const styles = StyleSheet.create({
   },
   error:{
     color:'red',
+    fontSize:16,
+    
+  },
+  success:{
+    color:'green',
     fontSize:16,
     
   },

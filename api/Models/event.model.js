@@ -20,7 +20,6 @@ const eventSchema=new mongoose.Schema({
     eventLocation:{
         latitude:Number,
         longitude:Number,
-      
     },
     place:{
         type:String,

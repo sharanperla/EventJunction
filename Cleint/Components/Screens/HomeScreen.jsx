@@ -40,7 +40,7 @@ function HomeScreen({navigation}) {
   
   
   useEffect(() => {
-    console.log(userData.user.interests.length)
+    // console.log(userData.user.interests.length)
     if (!userData.user.interests || userData.user.interests.length === 0) {
       navigation.navigate('Interests');
       return 
@@ -61,7 +61,7 @@ function HomeScreen({navigation}) {
     try {
       setLoading(true)
       setGetEventsError(false)
-      const res=await fetch(`http://192.168.43.4:3000/api/event/getEvents`)
+      const res=await fetch(`http://192.168.43.4:3000/api/event/getEvents?userRef=${userData.user._id}`)
      
       const data=await res.json();
       if(data.success===false)
@@ -108,7 +108,7 @@ function HomeScreen({navigation}) {
     try {
       setLoading(true)
       setGetEventsError(false)
-      const res=await fetch(`http://192.168.43.4:3000/api/event/getEvents?genre=Dance`)
+      const res=await fetch(`http://192.168.43.4:3000/api/event/getEvents?genre=Dance&userRef=${userData.user._id}`)
      
       const data=await res.json();
       if(data.success===false)
@@ -130,7 +130,7 @@ function HomeScreen({navigation}) {
     try {
       setLoading(true)
       setGetEventsError(false)
-      const res=await fetch(`http://192.168.43.4:3000/api/event/getEvents?genre=Music`)
+      const res=await fetch(`http://192.168.43.4:3000/api/event/getEvents?genre=Music&userRef=${userData.user._id}`)
      
       const data=await res.json();
       if(data.success===false)
@@ -153,19 +153,19 @@ function HomeScreen({navigation}) {
     try {
       setLoading(true)
       setGetEventsError(false)
-      const res=await fetch(`http://192.168.43.4:3000/api/event/getEvents?genre=${userData.user.interests}`)
+      const res=await fetch(`http://192.168.43.4:3000/api/event/getEvents?genre=${userData.user.interests}&userRef=${userData.user._id}`)
      
       const data=await res.json();
       if(data.success===false)
       {
         setLoading(false)
         setGetEventsError(true)
-        console.log(data)
+        // console.log(data)
         return;
       }
       setInterestedEvents(data)
       setLoading(false)
-      console.log("interested events",interestedEvents)
+      // console.log("interested events",interestedEvents)
       
       // console.log(allEvents)
     } catch (error) {

@@ -28,7 +28,7 @@ function IntrestsScreen({navigation}) {
     
       // Assuming these are already defined correctly in your component
       const userId = userData.user._id;
-      console.log(selectedInterests)
+      // console.log(selectedInterests)
       const formData = { userId, selectedInterests };
     
       try {
@@ -42,7 +42,7 @@ function IntrestsScreen({navigation}) {
     
         const data = await res.json();
         if (!res.ok) {
-          console.log(data)
+          // console.log(data)
           throw new Error('Failed to update user');
         }
     

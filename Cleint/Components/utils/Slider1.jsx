@@ -12,27 +12,55 @@ export function Slider1({data, name }){
       <View style={styles.container}>
         <Text style={styles.CategoryTitle}>{name}</Text>
          <FlatList
+      contentContainerStyle={styles.flatListContent1}
+      horizontal
+        data={data}
+        showsHorizontalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <View >
+          <Pressable onPress={()=>{handleNavigation(item)}} >
+            <ImageBackground
+              source={{ uri: item.EventImage }}
+              style={styles.Slider1Image1}
+            >
+              
+            </ImageBackground>
+
+          </Pressable>
+          <View style={styles.SliderDetails}>
+                <Text style={styles.SliderName}>{item.eventName}</Text>
+                <Text style={styles.SliderPlace}>{item.eventGenere}{item.place?item.place!=="Location not selected"?" | "+item.place.split(" ")[2]:"":""}</Text>
+              </View>
+          </View>
+        )}
+      
+      /> 
+        
+         {/* <FlatList
       contentContainerStyle={styles.flatListContent}
       horizontal
         data={data}
         showsHorizontalScrollIndicator={false}
         renderItem={({ item }) => (
+          <View >
           <Pressable style={styles.coroselContainer} onPress={()=>{handleNavigation(item)}}>
             <ImageBackground
               source={{ uri: item.EventImage }}
               style={styles.Slider1Image}
             >
-              <View style={styles.overlay} />
               <View style={styles.SliderDetails}>
+               <View style={styles.overlay} /> 
                 <Text style={styles.SliderName}>{item.eventName}</Text>
                 <Text style={styles.SliderPlace}>{item.eventGenere}</Text>
               </View>
             </ImageBackground>
+
           </Pressable>
+          </View>
         )}
       
       /> 
-        
+         */}
       </View>
     )
   
@@ -43,8 +71,6 @@ export default Slider1
 const styles=StyleSheet.create({
   container:{
     // backgroundColor:'red',
-    height:200,
-   
   },
   flatListContent:{
     gap:10,
@@ -64,25 +90,44 @@ const styles=StyleSheet.create({
   },
     overlay: {
       ...StyleSheet.absoluteFillObject,
-      backgroundColor: 'rgba(0,0,0,0.6)', // Semi-transparent black color
+      backgroundColor: 'rgba(0,0,0,0.7)',
+      borderRadius:10, // Semi-transparent black color
     },
     SliderDetails:{
     padding:5,
+    alignItems:'center',
     },
     SliderName:{
-      color:'white',
+      color:'black',
       fontSize:16,
-      fontWeight:'bold'
+      fontWeight:'bold',
+      maxWidth:105,
+      textAlign:'center'
     },
     SliderPlace:{
-      color:'white',
-      fontSize:12,
+      color:'black',
+      fontSize:9,
     },
     CategoryTitle:{
       fontSize:17,
       fontWeight:'bold',
       marginVertical:10,
       marginLeft:20,
-    }
+    },
+    flatListContent1:{
+      gap:10,
+      padding:4,
+      marginHorizontal:20,
+    },
+    Slider1Image1:{
+      borderRadius:10,
+      overflow:'hidden',
+      width:110,
+      height:150,
+      // justifyContent:'flex-end',
+      
+      
+    },
+    
   
 })

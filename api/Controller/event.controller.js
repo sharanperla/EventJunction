@@ -19,13 +19,20 @@ export const getAllEvents = async (req, res, next) => {
     const searchTerm = req.query.searchTerm || "";
     const sort = req.query.sort || "createdAt";
     const order = req.query.order || "desc";
-
+    const userRef=req.query.userRef||" "
+    const eventLocation=req.body.eventLocation
     let filter = { };
+
+
+    if(eventLocation)
+    {
+      filter.eventLocation
+    }
     if (searchTerm) {
         filter.eventName = { $regex: searchTerm, $options: "i" }; // Case-insensitive by default
       }
     if (req.query.genre) {
-      console.log("interests",req.query.genre.split(","))
+     
       const genres = req.query.genre.split(","); // Split comma-separated genres
       filter.eventGenere = { $in: genres }; // Filter by events with any of the genres
     }
@@ -33,6 +40,10 @@ export const getAllEvents = async (req, res, next) => {
       
         const specifiedAmount = parseInt(req.query.eventAmount);
         filter.eventAmount = { $lt: specifiedAmount }; // Filter for events less than specified amount
+      }
+      if(userRef)
+      {
+        filter.userRef={$ne:userRef}
       }
 
     const events = await Event.find(filter)
@@ -106,7 +117,6 @@ export const getParticipants = async (req, res, next) => {
           // Find bookings with the specified eventId
           const bookings = await Bookings.find({eventId:eventsid}).limit(4).sort();
   
-
           if (!bookings || bookings.length === 0) {
               return res.status(404).json({ message: "No participants found for this event" });
           }
@@ -177,5 +187,39 @@ export const getUserEvents = async (req, res, next) => {
     }
   } else {
     res.status(400).json({ message: "User ID is required" });
+  }
+};
+
+export const updateEvent = async (req, res, next) => {
+  console.log("Update event endpoint hit");  // Confirm the endpoint is hit
+  try {
+    const updatedEvent = await Event.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: {
+          eDate: req.body.eDate,
+          eventAmount: req.body.eventAmount,
+          eventDesc: req.body.eventDesc,
+          eventGenere: req.body.eventGenere,
+          eventName: req.body.eventName,
+          place: req.body.place,
+          eventLocation: req.body.eventLocation,
+          EventImage: req.body.EventImage,
+        },
+      },
+      { new: true }
+    );
+
+    if (!updatedEvent) {
+      console.log("Event not found");
+      return res.status(404).json({ success: false, message: "Event not found" });
+    }
+
+    const rest = updatedEvent._doc;
+    console.log("Updated event:", rest);  // Log the updated event
+    res.status(200).json({ success: true, data: rest });
+  } catch (error) {
+    console.log("Error updating event:", error);
+    next(error);
   }
 };

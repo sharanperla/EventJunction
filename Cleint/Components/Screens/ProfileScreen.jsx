@@ -9,7 +9,7 @@ import { AuthContext } from "../../Context/AuthContext";
 export default function ProfileScreen({ navigation }) {
   const { currentUser, setCurrentUser ,userData} = useContext(AuthContext);
   const [loggedOut, setLoggedOut] = useState(false);
-  console.log("userDta",userData.user._id);
+  // console.log("userDta",userData.user._id);
 
   const toEditBio = () => {
     navigation.navigate("EditProfileScreen");
@@ -74,7 +74,7 @@ export default function ProfileScreen({ navigation }) {
       <View style={styles.optionContainer}>
         <View style={styles.optionIconWithName}>
           <Ionicons name="calendar" size={30} />
-          <Text>Add event</Text>
+          <Text>Create event</Text>
         </View>
         <Ionicons name="chevron-forward" size={30} onPress={toAddEvent} />
       </View>

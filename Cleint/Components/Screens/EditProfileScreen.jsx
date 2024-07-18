@@ -24,18 +24,19 @@ import color from '../../assets/color';
 
 
 export default function EditProfileScreen({navigation}){
-  const {profileUpdateStart,profileUpdateSuccess,profileUpdateFailure,userData,setUserData}=useContext(AuthContext)
+  const {profileUpdateStart,profileUpdateSuccess,profileUpdateFailure,userData,setUserData,globalError}=useContext(AuthContext)
   const [selectedImage, setSelectedImage] = useState(null);
   const [formData,setFormData]=useState({})
   const [filePerc,setFileperc]=useState(null)
   const [fileUploadError,setFileUploadError]=useState(null);
   const [fileUploadActive,setFileUploadActive]=useState(false);
+  const [updateSuccess,setUpdateSuccess]=useState(false)
 
   // console.log(formData)
 
   
 
-console.log(formData)
+// console.log(formData)
 const uploadImage = async (selectedImage) => {
 try {
   setFileUploadActive(true);
@@ -143,6 +144,7 @@ try {
 
 const handleSubmit = async (e)=>{
   try {
+    setUpdateSuccess(false)
     e.preventDefault();
     profileUpdateStart();
     const res=await fetch(`http://192.168.43.4:3000/api/user/update/${userData.user._id}`,{
@@ -153,14 +155,14 @@ const handleSubmit = async (e)=>{
       body: JSON.stringify(formData),
     });
     const data= await res.json();
-    
     if(data.success===false)
     {
       profileUpdateFailure(data.message)
       console.log('error at sucess',data)
       return
-
+      
     }
+    setUpdateSuccess(true)
     console.log("Form data submitted:");
     setUserData({
       ...userData, // Spread the existing userData object
@@ -169,6 +171,7 @@ const handleSubmit = async (e)=>{
     profileUpdateSuccess(data);
 
   } catch (error) {
+    setUpdateSuccess(false)
     console.log(error);
     profileUpdateFailure(error.message)
     
@@ -226,6 +229,8 @@ const handleSubmit = async (e)=>{
                Save Changes
             </Text>
           </Pressable>
+          {updateSuccess&&<Text style={styles.success}>Successfully updated</Text>}
+          {globalError&&<Text style={styles.success}>{globalError.message}</Text>}
         </View>
        
       </SafeAreaView>
@@ -300,6 +305,13 @@ const styles = StyleSheet.create({
         color:"green",
       },
       uploadFailureText:{
+        color:'red'
+      },
+      success:{
+         color:"green",
+
+      },
+      error:{
         color:'red'
       }
 })

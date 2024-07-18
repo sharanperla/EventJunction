@@ -33,7 +33,7 @@ export default function BookingsScreen() {
         return;
       }
       setMyEvents(data.data)
-      console.log(myEvents)
+      // console.log(myEvents)
     } catch (error) {
       setGetEventsError(true)
     }
@@ -72,17 +72,19 @@ export default function BookingsScreen() {
         <ScrollView style={styles.MainContainer}>
         <View style={styles.LatestContainer}>
           <Text style={styles.CategoryTitle}>Upcoming</Text>
-             {myUpcoming&&<ImageBackground resizeMode='cover'
+             {myUpcoming&&<View><ImageBackground resizeMode='cover'
              source={{ uri: myUpcoming.EventImage?  myUpcoming.EventImage: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s" }}
              style={styles.LatestBackground} >
-             <View style={styles.overLay}></View>
-             <View style={styles.innerView}>
-             <Text style={styles.title}>{myUpcoming.eventName}</Text>
-             <Text style={styles.brief}>{myUpcoming.eventGenere} || {myUpcoming.eDate?myUpcoming.eDate.substring(0,10):' '} || Time</Text>
-             <Text numberOfLines={2} style={styles.Desc}>{myUpcoming.eventDesc}</Text>
 
+             <View style={styles.innerView}>
+              <View style={styles.overLay}/>
+             <Text style={styles.title}>{myUpcoming.eventName}</Text>
+             <Text style={styles.brief}>{myUpcoming.eventGenere} | {myUpcoming.eDate?myUpcoming.eDate.substring(0,10):' '} | Time</Text>
+             <Text numberOfLines={2} style={styles.Desc}>{myUpcoming.eventDesc}</Text>
              </View>
-             </ImageBackground>}
+             </ImageBackground>
+             
+             </View>}
         </View>
        <Slider2 data={myEvents} name={"This Week"}/>
        <Slider2 data={myEvents} name={"Others"}/>
@@ -95,11 +97,11 @@ export default function BookingsScreen() {
 
 const styles=StyleSheet.create({
   MainContainer:{
-    height:'100%'
+
   },
   LatestContainer:{
     width:'100%',
-    height:400,
+    height:350,
     padding:20,
     marginBottom:10,
 
@@ -112,19 +114,17 @@ const styles=StyleSheet.create({
     overflow:'hidden',
   
   },
+
   CategoryTitle:{
     fontSize:17,
+    marginVertical:5,
     fontWeight:'bold',
-    marginVertical:5
 },
 overLay:{
-  position:'absolute',
-  width:'100%',
-  height:'100%',
-  backgroundColor:'black',
-  opacity:0.5,
-  borderRadius:10,
-  overflow:'hidden'
+  borderRadius:20,
+  ...StyleSheet.absoluteFillObject,
+  backgroundColor: 'rgba(0,0,0,0.7)', 
+  // Semi-transparent black color
 },
 title:{
   color:'white',
@@ -133,17 +133,18 @@ title:{
 },
 brief:{
     color:'white',
-
-    fontSize:12,
-    fontWeight:'bold',
-    opacity:0.6
+    fontSize:9,
+    opacity:0.9,
+    gap:8
 },
 innerView:{
-paddingHorizontal:10,
+paddingHorizontal:7,
+paddingVertical:5,
+margin:5,
 },
 Desc:{
  color:'white',
- fontSize:14
+ fontSize:9
 }
 
 

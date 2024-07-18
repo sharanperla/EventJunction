@@ -26,11 +26,11 @@ export function HomeCourosel({ data }) {
               style={styles.CouroselImage}
              
             >
-              <View style={styles.overlay} />
-              <View style={styles.CouroselDetails} >
+              {/* <View style={styles.CouroselDetails} >
+                 <View style={styles.overlay} />
                 <Text style={styles.CouroselName}>{item.eventName}</Text>
                 <Text style={styles.CouroselPlace}>{item.eventGenere}</Text>
-              </View>
+              </View> */}
             </ImageBackground>
           </Pressable>
         )}
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   CouroselDetails: {
-    padding: 10,
+    padding: 2,
   },
   CouroselName: {
     fontSize: 20,
@@ -81,7 +81,8 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.4)', // Semi-transparent black color
+    backgroundColor: 'rgba(0,0,0,0.4)', 
+    borderRadius:10,// Semi-transparent black color
   },
 });
 

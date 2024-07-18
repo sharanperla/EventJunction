@@ -22,7 +22,10 @@ const DisplayScreen = ({route,navigation}) => {
   const [liked,setLiked]=useState(eventData.likedBy.includes(userData.user._id));
   const [likedCount,setLikedCount]=useState(eventData.Likes);
   const [participants,setParticipants]=useState({});
-  console.log("eventdata",userData)
+  const [registered,setRegistered]=useState(false)
+  // console.log("eventdata",eventData)
+
+  const owner=eventData.userRef===userData.user._id
  
 
   const userId=userData.user._id;
@@ -46,7 +49,7 @@ const DisplayScreen = ({route,navigation}) => {
         return
   
       }
-      console.log("liked",data);
+
       setLikedCount(data.Likes)
       
       setLiked(data.likedBy.includes(userData.user._id))
@@ -98,6 +101,10 @@ const DisplayScreen = ({route,navigation}) => {
     );
   };
 
+  const handleEdit=(item)=>{
+    navigation.navigate("EditScreen",{data:item})
+  }
+
   const getParticipants=async()=>{
     try {
       const res=await fetch(`http://192.168.43.4:3000/api/event/participants?id=${eventData._id}&userid=${userData.user._id}`)
@@ -111,9 +118,7 @@ const DisplayScreen = ({route,navigation}) => {
         return;
       }
       setParticipants(data.data)
-      console.log('******',participants[0]);
-      
-      
+      setRegistered(participants[0].register)
     } catch (error) {
       console.log(error)
     }
@@ -131,7 +136,7 @@ const DisplayScreen = ({route,navigation}) => {
 
 
   return (
-    <SafeAreaView>
+    <SafeAreaView >
       <ScrollView>
         <Image
           style={styles.DisplayImg}
@@ -173,21 +178,18 @@ const DisplayScreen = ({route,navigation}) => {
            <View>
 
            <View style={styles.tagContainer}>
-           <Text style={styles.tag}>{eventData.place?eventData.place:' '}</Text>
+           <Text style={styles.tag}>{eventData.place?eventData.place.split(',')[1]:' '}</Text>
            <Text style={styles.tag}>{eventData.eDate?eventData.eDate.substring(0,10):' '}</Text>
+           <Text style={styles.tag}>{eventData.eventGenere?eventData.eventGenere:' '}</Text>
             </View>
-            <Text style={styles.eventGenere}>
-            Dama * 
-  Comedy *
-  Entertainment
-            </Text>
            </View>
            <Text style={styles.para1}>{eventData.eventDesc}</Text>
            
            <View style={{justifyContent:'center',alignItems:'center'}}>
 
-          {/* <Text style={styles.SplashButton} onPress={handleConfirm} >{participants[0].register ?"registered":"Join Event"}</Text> */}
-          {/* <Text style={styles.SplashButton} onPress={handleConfirm} >Join Event</Text> */}
+        {owner?<Text style={[styles.SplashButton,!owner ? styles.disabled : styles.enabled]} onPress={()=>handleEdit(eventData)} disabled={!owner} >Edit</Text>:
+        <Text style={[styles.SplashButton,participants[0]&&participants[0].register ? styles.disabled : styles.enabled]} onPress={handleConfirm} disabled={participants[0]&&participants[0].register || owner} >{ owner?"You are the Owner":participants[0]&&participants[0].register?"registered":"Join Event"}</Text>}
+          {/* <Text style={styles.SplashButton} onPress={handleConfirm} >Join Event</Text>  owner?"You are the Owner":participants[0]&&participants[0].register?"registered":"Join Event"  */}
            </View>
           
           </View>
@@ -261,6 +263,8 @@ const styles = StyleSheet.create({
   {
     flexDirection:'row',
     gap:2,
+    maxWidth:'50%',
+    
   },
   tag:{
     backgroundColor:'#D9D9D9',
@@ -305,5 +309,16 @@ const styles = StyleSheet.create({
   heartText:{
     fontSize:1,
     color:'red'
-  }
+  },
+
+  disabled: {
+    backgroundColor:color.primaryColor,
+    opacity:0.5,
+    color: 'white',
+  },
+  enabled: {
+    backgroundColor:color.primaryColor,
+    opacity:0.8,
+    color: 'white',
+  },
 });

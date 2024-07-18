@@ -7,9 +7,11 @@ export const EventProvider = ({ children }) => {
   const [isEventLoading, setIsEventLoading] = useState(false);
   const [eventData, setEventData] = useState({});
   const [globalError, setGlobalError] = useState(null);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
 
   const createEventStart = () => {
     setIsEventLoading(true);
+
   };
 
   const createEventSuccess = (value) => {
@@ -25,6 +27,24 @@ export const EventProvider = ({ children }) => {
     setEventData(null);
   };
 
+  const editEventStart=()=>{
+    setIsEventLoading(true);
+    setGlobalError(null);
+    setUpdateSuccess(false)
+  }
+  const editEventSuccess = (value) => {
+    setIsEventLoading(false);
+    setGlobalError(null)
+    setUpdateSuccess(true)
+  };
+
+  const editEventFailure = (error) => {
+    console.log('err',error)
+    setIsEventLoading(false);
+    setGlobalError(error);
+    setUpdateSuccess(false)
+  };
+
   return (
     <EventContext.Provider
       value={{
@@ -34,7 +54,12 @@ export const EventProvider = ({ children }) => {
         globalError,
         createEventStart,
         createEventSuccess,
-        createEventFailure
+        createEventFailure,
+        editEventStart,
+        editEventFailure,
+        editEventSuccess,
+        updateSuccess,
+        setUpdateSuccess
       }}
     >
       {children}
