@@ -1,217 +1,285 @@
-import React ,{useState,useEffect, useContext} from 'react'
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import Header from '../utils/Header'
-import HomeCourosel from '../utils/HomeCourosel';
-import Slider1 from '../utils/Slider1';
-import { ScrollView } from 'react-native-gesture-handler';
-import { useFocusEffect } from '@react-navigation/native';
-import { AuthContext } from '../../Context/AuthContext';
+import React, { useState, useEffect, useContext, useMemo } from "react";
+import {
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Header from "../utils/Header";
+import HomeCourosel from "../utils/HomeCourosel";
+import Slider1 from "../utils/Slider1";
+import { ScrollView } from "react-native-gesture-handler";
+import { useFocusEffect } from "@react-navigation/native";
+import { AuthContext } from "../../Context/AuthContext";
+import * as Location from "expo-location";
 
+function HomeScreen({ navigation }) {
+  const [myLocation, setMyLocation] = useState();
+  const [loading, setLoading] = useState(false);
+  const { userData, setUserData } = useContext(AuthContext);
+  const [newUserData, setNewUserData] = useState({});
+  const [getEventsError, setGetEventsError] = useState(false);
+  const [allEvents, setAllEvents] = useState(false);
+  const [danceEvents, setDanceEvents] = useState({});
+  const [musicEvents, setMusicEvents] = useState({});
+  const [nearByEvents, setNearByEvents] = useState({});
+  const [interestedEvents, setInterestedEvents] = useState([]);
 
+  //fetching users current location
+  const fetchLocation = useMemo(() => {
+    return async () => {
+      setLoading(true);
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.error("Permission to access location was denied");
+        setLoading(false);
+        return;
+      }
+      const location = await Location.getCurrentPositionAsync({});
+      setMyLocation(location);
+      setLoading(false);
+      // console.log("User location:", location.coords);
+    };
+  }, []);
 
-function HomeScreen({navigation}) {
+  useEffect(() => {
+    if (!myLocation) {
+      fetchLocation();
+    }
+  }, [fetchLocation, myLocation]);
 
-  const {userData,setUserData}=useContext(AuthContext);
-  const [newUserData,setNewUserData]=useState({});
-
-  // const getUserData=async ()=>{
-  //   try {
-  //     // setGetEventsError(false)
-  //     const res=await fetch(`http://192.168.43.4:3000/api/user/getUserData/${userData.user._id}`)
-     
-  //     const data=await res.json();
-  //     if(data.success===false)
-  //     {
-      
-  //       // setGetEventsError(true)
-  //       console.log(data);
-  //       return;
-  //     }
-  //     setUserData({user:data[0]})
-
-  //     // console.log(allEvents)
-  //   } catch (error) {
-  //     // setGetEventsError(true)
-  //     console.log(error)
-  //   }
-    
-  // }
-  
   
   useEffect(() => {
     // console.log(userData.user.interests.length)
     if (!userData.user.interests || userData.user.interests.length === 0) {
-      navigation.navigate('Interests');
-      return 
+      navigation.navigate("Interests");
+      return;
     }
-  }, []);
-  
-  const [getEventsError,setGetEventsError]=useState(false);
-  const [allEvents,setAllEvents]=useState(false);
-  const [danceEvents,setDanceEvents]=useState({});
-  const [musicEvents,setMusicEvents]=useState({});
-  const [interestedEvents,setInterestedEvents]=useState([]);
-  const [loading,setLoading]=useState(false)
+  }, [userData.user.interests]);
+
+
+    useEffect(() => {
+      if (myLocation) {
+        getNearByEvents();
+      }
+    }, [myLocation]);
+
   
   //allEvents
-  
-
-  const getEvents=async ()=>{
+  const getEvents = async () => {
     try {
-      setLoading(true)
-      setGetEventsError(false)
-      const res=await fetch(`http://192.168.43.4:3000/api/event/getEvents?userRef=${userData.user._id}`)
-     
-      const data=await res.json();
-      if(data.success===false)
-      {
-        setLoading(false)
-        setGetEventsError(true)
+      setLoading(true);
+      setGetEventsError(false);
+      const res = await fetch(
+        `http://192.168.43.4:3000/api/event/getEvents?userRef=${userData.user._id}`
+      );
+
+      const data = await res.json();
+      if (data.success === false) {
+        setLoading(false);
+        setGetEventsError(true);
 
         return;
       }
-      setAllEvents(data)
-      setLoading(false)
+      setAllEvents(data);
+      setLoading(false);
       // console.log(allEvents)
     } catch (error) {
-      setLoading(false)
-      setGetEventsError(true)
+      setLoading(false);
+      setGetEventsError(true);
     }
-    
-  }
+  };
 
-  useEffect(() => {
 
-    getEvents();
-    getDanceEvents();
-    getInterestEevents();
-    getMusicEvents()
- 
-  }, [])
-
-  useFocusEffect(
-    React.useCallback(() => {
-      getEvents();
-    getDanceEvents();
-    getInterestEevents()
-    getMusicEvents()
-    if (!userData.user.interests || userData.user.interests.length === 0) {
-      navigation.navigate('Interests');
-      return 
-    }
-
-    }, [])
-  );
   //genere=dance
-  const getDanceEvents=async ()=>{
+  const getDanceEvents = async () => {
     try {
-      setLoading(true)
-      setGetEventsError(false)
-      const res=await fetch(`http://192.168.43.4:3000/api/event/getEvents?genre=Dance&userRef=${userData.user._id}`)
-     
-      const data=await res.json();
-      if(data.success===false)
-      {
-        setLoading(false)
-        setGetEventsError(true)
+      setLoading(true);
+      setGetEventsError(false);
+      const res = await fetch(
+        `http://192.168.43.4:3000/api/event/getEvents?genre=Dance&userRef=${userData.user._id}`
+      );
+
+      const data = await res.json();
+      if (data.success === false) {
+        setLoading(false);
+        setGetEventsError(true);
         return;
       }
-      setDanceEvents(data)
-      setLoading(false)
+      setDanceEvents(data);
+      setLoading(false);
       // console.log(allEvents)
     } catch (error) {
-      setLoading(false)
-      setGetEventsError(true)
+      setLoading(false);
+      setGetEventsError(true);
     }
-    
-  }
-  const getMusicEvents=async ()=>{
+  };
+
+  //NearbyEvents --events within 20 kms
+
+  const getNearByEvents = async () => {
     try {
-      setLoading(true)
-      setGetEventsError(false)
-      const res=await fetch(`http://192.168.43.4:3000/api/event/getEvents?genre=Music&userRef=${userData.user._id}`)
-     
-      const data=await res.json();
-      if(data.success===false)
-      {
-        setLoading(false)
-        setGetEventsError(true)
+      setLoading(true);
+      setGetEventsError(false);
+      let latitude = await myLocation.coords.latitude;
+      let longitude = await myLocation.coords.longitude;
+      console.log(latitude, longitude);
+      const res = await fetch(
+        `http://192.168.43.4:3000/api/event/getEvents?userRef=${userData.user._id}&latitude=${latitude}&longitude=${longitude}`
+      );
+
+      const data = await res.json();
+      if (data.success === false) {
+        setLoading(false);
+        setGetEventsError(true);
         return;
       }
-      setLoading(false)
-      setMusicEvents(data)
-      
+      setNearByEvents(data);
+      setLoading(false);
+  
+    } catch (error) {
+      setLoading(false);
+      setGetEventsError(true);
+    }
+  };
+
+  //genre=music
+  const getMusicEvents = async () => {
+    try {
+      setLoading(true);
+      setGetEventsError(false);
+      const res = await fetch(
+        `http://192.168.43.4:3000/api/event/getEvents?genre=Music&userRef=${userData.user._id}`
+      );
+
+      const data = await res.json();
+      if (data.success === false) {
+        setLoading(false);
+        setGetEventsError(true);
+        return;
+      }
+      setLoading(false);
+      setMusicEvents(data);
+
       // console.log(allEvents)
     } catch (error) {
-      setLoading(false)
-      setGetEventsError(true)
+      setLoading(false);
+      setGetEventsError(true);
     }
-    
-  }
-  const getInterestEevents=async ()=>{
+  };
+
+  //interested events
+  const getInterestEevents = async () => {
     try {
-      setLoading(true)
-      setGetEventsError(false)
-      const res=await fetch(`http://192.168.43.4:3000/api/event/getEvents?genre=${userData.user.interests}&userRef=${userData.user._id}`)
-     
-      const data=await res.json();
-      if(data.success===false)
-      {
-        setLoading(false)
-        setGetEventsError(true)
+      setLoading(true);
+      setGetEventsError(false);
+      const res = await fetch(
+        `http://192.168.43.4:3000/api/event/getEvents?genre=${userData.user.interests}&userRef=${userData.user._id}`
+      );
+
+      const data = await res.json();
+      if (data.success === false) {
+        setLoading(false);
+        setGetEventsError(true);
         // console.log(data)
         return;
       }
-      setInterestedEvents(data)
-      setLoading(false)
+      setInterestedEvents(data);
+      setLoading(false);
       // console.log("interested events",interestedEvents)
-      
+
       // console.log(allEvents)
     } catch (error) {
-      setLoading(false)
-      setGetEventsError(true)
-      console.log(error)
+      setLoading(false);
+      setGetEventsError(true);
+      console.log(error);
     }
-    
-  }
-
+  };
 
   // console.log(allEvents)
-  
-  return (
-    <SafeAreaView >
-     {loading?<View style={styles.spinner}><ActivityIndicator size="large" color="#0000ff" /></View>:
-     <ScrollView>
-       <Header/>
-       
-       <View style={styles.container} >
-       <HomeCourosel data={allEvents} />
-       
-       {interestedEvents.length>0&&<Slider1 data={interestedEvents} name={"Recommended"}/>}
-       <Slider1 data={allEvents} name={"Special"}/>
-       <Slider1 data={danceEvents} name={"Dance"}/>
-       <Slider1 data={musicEvents} name={"Music"}/>
 
-       </View>
-      
-       </ScrollView>
-     }
+  useEffect(() => {
+    getEvents();
+    getDanceEvents();
+    getInterestEevents();
+    getMusicEvents();
+  }, []);
+
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      getEvents();
+      getDanceEvents();
+      getInterestEevents();
+      getMusicEvents();
+      if (myLocation) {
+        getNearByEvents();
+      }
+      if (!userData.user.interests || userData.user.interests.length === 0) {
+        navigation.navigate("Interests");
+        return;
+      }
+    }, [])
+  );
+
+  return (
+    <SafeAreaView>
+      {loading ? (
+        <View style={styles.spinner}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      ) : (
+        <ScrollView>
+          <Header />
+
+          <View style={styles.container}>
+            {!allEvents||allEvents.length===0&&<View style={styles.notFoundContainer}>
+               <Image style={styles.illlustration} source={require("../../assets/illustrations/noresult.png")} size={5} />
+                <Text style={styles.notFound}>No events found!</Text>
+              </View>}
+          {allEvents.length>0&&<HomeCourosel data={allEvents} />}
+             {nearByEvents.length>0&&<Slider1 data={nearByEvents} name={"Nearby Events"} />}
+            {interestedEvents.length > 0 && (
+              <Slider1 data={interestedEvents} name={"Recommended"} />
+            )}
+            {danceEvents.length>0&&<Slider1 data={danceEvents} name={"Dance"} />}
+           {musicEvents.length>0&&<Slider1 data={musicEvents} name={"Music"} />}
+            {allEvents.length>0&&<Slider1 data={allEvents} name={"Other"} />}
+          </View>
+        </ScrollView>
+      )}
     </SafeAreaView>
-  )
+  );
 }
 
-export default HomeScreen
+export default HomeScreen;
 
-const styles=StyleSheet.create({
-  container:{
-    paddingVertical:20,
+const styles = StyleSheet.create({
+  container: {
+    paddingVertical: 20,
   },
-  spinner:{
-    height:'100%',
+  spinner: {
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  notFound:{
+    textAlign:'center',
+    fontSize:18,
+  },
+  illlustration:{
+    width:300,
+    height:300,
+    objectFit:'contain',
+    borderRadius:10,
+  },
+  notFoundContainer:{
+    width:'100%',
     justifyContent:'center',
-    alignItems:'center'
+    alignItems:'center',
+    marginVertical:90,
   }
-  
 });
-

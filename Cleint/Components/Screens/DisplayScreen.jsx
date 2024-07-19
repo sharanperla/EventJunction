@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { Component, useContext, useEffect, useState } from "react";
-import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthContext } from "../../Context/AuthContext";
@@ -12,19 +12,27 @@ const DisplayScreen = ({route,navigation}) => {
   // const [newEventData,setNewEventData]=useState(null);
   
   
-  const eventData = route.params?.data;
-  
   if (!route) {
     // Handle cases where data is missing (e.g., display an error message)
     return <Text>Error: Event data not found!</Text>;
   }
+  const eventData = route.params?.data;
+  const registeredPage=route?.params?.registeredPage;
+
+  console.log('this is the event',eventData);
   
   const [liked,setLiked]=useState(eventData.likedBy.includes(userData.user._id));
   const [likedCount,setLikedCount]=useState(eventData.Likes);
   const [participants,setParticipants]=useState({});
-  const [registered,setRegistered]=useState(false)
+  const [registered,setRegistered]=useState(false);
+  const [pageLoading,setPageLoading]=useState(false)
   // console.log("eventdata",eventData)
 
+
+  useEffect(() => {
+      eventData
+  }, [liked])
+  
   const owner=eventData.userRef===userData.user._id
  
 
@@ -65,6 +73,7 @@ const DisplayScreen = ({route,navigation}) => {
   const handleRegister=async()=>{
     console.log("pressed");
     try {
+      setPageLoading(true)
       const res=await fetch(`http://192.168.43.4:3000/api/event/register`,{
         method:'POST',
         headers:{
@@ -76,14 +85,16 @@ const DisplayScreen = ({route,navigation}) => {
       
       if(data.success===false)
       {
+        setPageLoading(false)
         console.log('error in  registering',data)
         return
   
       }
-  
+      setPageLoading(false)
       navigation.navigate("RegisterationScreen",{eventData})
     } catch (error) {
       console.log(error);
+      setPageLoading(false)
     }
   }
   const handleConfirm = () => {
@@ -100,6 +111,22 @@ const DisplayScreen = ({route,navigation}) => {
       ]
     );
   };
+  const handleUnRegConfirm = () => {
+    Alert.alert(
+      "Confirmation",
+      `Are you sure you want to Unregister from this event?`,
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Action canceled"),
+          style: "cancel"
+        },
+        { text: "OK", onPress: () => handleUnregister() }
+      ]
+    );
+  };
+
+
 
   const handleEdit=(item)=>{
     navigation.navigate("EditScreen",{data:item})
@@ -107,23 +134,57 @@ const DisplayScreen = ({route,navigation}) => {
 
   const getParticipants=async()=>{
     try {
+      setPageLoading(true)
       const res=await fetch(`http://192.168.43.4:3000/api/event/participants?id=${eventData._id}&userid=${userData.user._id}`)
      
       const data=await res.json();
       if(data.success===false)
       {
-        
+        setPageLoading(false)
         setGetEventsError(true)
         console.log('error',data)
         return;
       }
-      setParticipants(data.data)
-      setRegistered(participants[0].register)
+      setPageLoading(false)
+      setParticipants(data.data || []);
+      setRegistered(data.data.some(participant => participant.userId === userId));
     } catch (error) {
+      setPageLoading(false)
       console.log(error)
     }
   }
- 
+
+  const handleUnregister = async () => {
+    try {
+      setPageLoading(true);
+  
+      const res = await fetch(`http://192.168.43.4:3000/api/event/unregister?userId=${userData.user._id}&eventId=${eventData._id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (!res.ok) {
+        throw new Error(`HTTP error! Status: ${res.status}`);
+      }  
+  
+      const data = await res.json();
+     console.log(data);
+      if (data.success === false) {
+        setPageLoading(false);
+        console.log('Error in unregistering', data);
+        return;
+      }
+  
+      setPageLoading(false);
+      navigation.navigate("HomeScreen");
+    } catch (error) {
+      console.log(error);
+      setPageLoading(false);
+    }
+  };
+  
 
   useEffect(() => {
     getParticipants()
@@ -137,6 +198,11 @@ const DisplayScreen = ({route,navigation}) => {
 
   return (
     <SafeAreaView >
+       {pageLoading ? (
+        <View style={styles.spinner}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      ) :
       <ScrollView>
         <Image
           style={styles.DisplayImg}
@@ -188,13 +254,14 @@ const DisplayScreen = ({route,navigation}) => {
            <View style={{justifyContent:'center',alignItems:'center'}}>
 
         {owner?<Text style={[styles.SplashButton,!owner ? styles.disabled : styles.enabled]} onPress={()=>handleEdit(eventData)} disabled={!owner} >Edit</Text>:
-        <Text style={[styles.SplashButton,participants[0]&&participants[0].register ? styles.disabled : styles.enabled]} onPress={handleConfirm} disabled={participants[0]&&participants[0].register || owner} >{ owner?"You are the Owner":participants[0]&&participants[0].register?"registered":"Join Event"}</Text>}
+        participants[0]&&participants[0].register||registeredPage?<Text style={[styles.SplashButton,pageLoading? styles.disabled : styles.enabled]} onPress={handleUnRegConfirm} disabled={pageLoading || owner} >Unregister</Text>:<Text style={[styles.SplashButton,pageLoading ? styles.disabled : styles.enabled]} onPress={handleConfirm} disabled={pageLoading} >Join Event</Text>}
           {/* <Text style={styles.SplashButton} onPress={handleConfirm} >Join Event</Text>  owner?"You are the Owner":participants[0]&&participants[0].register?"registered":"Join Event"  */}
            </View>
           
           </View>
         </View>
       </ScrollView>
+}
     </SafeAreaView>
   );
 };
@@ -318,7 +385,12 @@ const styles = StyleSheet.create({
   },
   enabled: {
     backgroundColor:color.primaryColor,
-    opacity:0.8,
+    opacity:1,
     color: 'white',
+  },
+  spinner: {
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

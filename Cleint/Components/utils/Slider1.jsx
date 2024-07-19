@@ -7,17 +7,17 @@ export function Slider1({data, name }){
   const handleNavigation =(item)=>{
     navigation.navigate("DisplayScreen",{data:item})
   }
-
+  
     return (
-      <View style={styles.container}>
+     <View style={styles.container}>
         <Text style={styles.CategoryTitle}>{name}</Text>
          <FlatList
       contentContainerStyle={styles.flatListContent1}
       horizontal
         data={data}
         showsHorizontalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <View >
+        renderItem={({ item ,index}) => (
+          <View key={index}>
           <Pressable onPress={()=>{handleNavigation(item)}} >
             <ImageBackground
               source={{ uri: item.EventImage }}
@@ -27,9 +27,10 @@ export function Slider1({data, name }){
             </ImageBackground>
 
           </Pressable>
-          <View style={styles.SliderDetails}>
+              <View style={styles.SliderDetails}>
                 <Text style={styles.SliderName}>{item.eventName}</Text>
                 <Text style={styles.SliderPlace}>{item.eventGenere}{item.place?item.place!=="Location not selected"?" | "+item.place.split(" ")[2]:"":""}</Text>
+                <View></View>
               </View>
           </View>
         )}

@@ -37,9 +37,24 @@ function SignUpScreen({ navigation }) {
       [key]: value,
     });
   };
+  const validateForm = () => {
+    const requiredFields = ["username", "email", "password"];
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        return `The field ${field} is required.`;
+      }
+    }
+    return null;
+  };
 
   const handleSubmit = async (e) => {
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     try {
+
       setLoading(true);
       e.preventDefault();
       const { confirm, ...restFormData } = formData;
@@ -80,66 +95,72 @@ function SignUpScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView>
-      <View style={styles.Container}>
-        <View style={styles.subContainer}>
-          <View style={styles.LogoContainer}>
-            <Image style={styles.Image} source={require("../../assets/EJBlack.png")} />
-            <Text style={styles.LogoCap}>Event Junction</Text>
-          </View>
-          <View style={styles.SignUpdisc}>
-            <Text>Sign up to get started</Text>
-          </View>
-        </View>
-        <View style={styles.FormContainer}>
-          <TextInput
-            style={styles.inputStyle}
-            placeholder="enter username"
-            onChangeText={(text) => handleChange("username", text)}
+    <SafeAreaView style={styles.safeArea}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.Container}
+    >
+      <View style={styles.subContainer}>
+        <View style={styles.LogoContainer}>
+          <Image
+            style={styles.Image}
+            source={require("../../assets/EJBlack.png")}
           />
-          <TextInput
-            style={styles.inputStyle}
-            placeholder="enter email"
-            onChangeText={(text) => handleChange("email", text)}
-          />
-          <View style={styles.inputStyle}>
-            <TextInput
-              placeholder="enter password"
-              onChangeText={(text) => handleChange("password", text)}
-            />
-          </View>
-          <View style={styles.inputStyle}>
-            <TextInput
-              placeholder="enter password"
-              onChangeText={(text) => handleChange("confirm", text)}
-            />
-          </View>
-          {passMatch === false ? <Text>password doesnt match</Text> : ""}
-          <Pressable onPress={handleSubmit}>
-            <Text style={styles.SplashButton}>
-              {loading ? "Loading.." : "SignUp"}
-            </Text>
-          </Pressable>
-          <Text style={styles.errorMsg}>{error ? error : ""}</Text>
+          <Text style={styles.LogoCap}>Event Junction</Text>
         </View>
-        <View style={styles.subContainer3}>
-          <Text>
-            Dont have an acount?
-            <Text onPress={navigateToSignUp} style={styles.HighText}>
-              signIn
-            </Text>
-          </Text>
+        <View style={styles.SignUpdisc}>
+          <Text style={{textAlign:'center'}}>Enter your details to begin the excitement</Text>
         </View>
       </View>
-    </SafeAreaView>
+      <View style={styles.FormContainer}>
+        <TextInput
+          style={styles.inputStyle}
+          placeholder="Enter username"
+          onChangeText={(text) => handleChange("username", text)}
+        />
+        <TextInput
+          style={styles.inputStyle}
+          placeholder="Enter email"
+          onChangeText={(text) => handleChange("email", text)}
+        />
+        <View style={styles.inputStyle}>
+          <TextInput
+            placeholder="Enter password"
+            onChangeText={(text) => handleChange("password", text)}
+          />
+        </View>
+        <View style={styles.inputStyle}>
+          <TextInput
+            placeholder="Confirm password"
+            onChangeText={(text) => handleChange("confirm", text)}
+          />
+        </View>
+        {passMatch === false ? <Text style={{color:"red"}}>Passwords do not match</Text> : null}
+        <Pressable onPress={handleSubmit}>
+          <Text style={styles.SplashButton}>
+            {loading ? "Loading.." : "Sign Up"}
+          </Text>
+        </Pressable>
+        <Text style={styles.errorMsg}>{error ? error : ""}</Text>
+      </View>
+      <View style={styles.subContainer3}>
+        <Text>
+          Don't have an account?
+          <Text onPress={() => navigation.navigate("SignIn")} style={styles.HighText}>
+            Sign In
+          </Text>
+        </Text>
+      </View>
+    </KeyboardAvoidingView>
+  </SafeAreaView>
+
   );
 }
 
 export default SignUpScreen;
-
 const styles = StyleSheet.create({
   Container: {
-    // height: "100%",
+
     paddingVertical: 20,
     display: "flex",
     justifyContent: "space-between",
@@ -148,12 +169,21 @@ const styles = StyleSheet.create({
   LogoCap: {
     fontSize: 35,
     fontWeight: "bold",
+    color: "black",
+
+  },
+  subContainer:{
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    height: "100%",
   },
   LogoContainer: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    gap: -40,
     paddingTop: 40,
   },
   inputStyle: {
@@ -162,10 +192,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 10,
     borderWidth: 1,
+    marginBottom: 10, // Added margin bottom to create space between input fields
   },
   SplashButton: {
     color: "#fff",
-    // backgroundColor: "#F10EDB",
     backgroundColor: color.primaryColor,
     width: 300,
     paddingHorizontal: 11,
@@ -174,24 +204,26 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "bold",
     fontSize: 18,
+    marginTop: 10, // Added margin top to create space above the button
   },
   FormContainer: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    gap: 10,
-    marginTop: -100,
+    marginTop: 20, // Adjusted margin to create space between sub-container and form container
   },
-
   SignUpdisc: {
-    textAlign: "center",
+    fontSize: 17,
+    fontWeight: "normal",
+    color: "black",
+    width:'50%',
   },
-  SignUpdisc: {},
   subContainer: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    gap: 20,
+    gap: 5,
+    marginBottom: 20, // Added margin bottom to create space between logo and form container
   },
   HighText: {
     color: "#1976D2",
@@ -202,8 +234,13 @@ const styles = StyleSheet.create({
     color: "red",
     maxWidth: "80%",
     textAlign: "center",
+    marginTop: 10, // Added margin top to create space above the error message
   },
-  Image:{
-    tintColor:color.primaryColor
-  }
+  Image: {
+    tintColor: color.primaryColor,
+    marginBottom: -20,
+  },
+  subContainer3: {
+    marginTop: 20, // Added margin top to create space above the footer text
+  },
 });

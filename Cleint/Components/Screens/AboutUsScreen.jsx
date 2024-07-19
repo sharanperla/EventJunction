@@ -14,32 +14,22 @@ const AboutUsScreen = () => {
             source={require("../../assets/EJBlack.png")}
             style={styles.image}
           />
+          <Text style={styles.heading1}>Welcome to Event Junction!</Text>
           <Text style={styles.text}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum.
+          Event Junction is your ultimate companion for discovering and exploring events happening around you. Whether you're looking for concerts, festivals, conferences, or local gatherings, we've got you covered. Our app is designed to connect you with the best events and experiences in your area and beyond.
+          </Text>
+          <Text style={styles.heading1}>Key Features</Text>
+          <Text style={styles.text}>
+          Discover Events: Easily browse through a wide range of events happening in your city and beyond. From music festivals and sports events to art exhibitions and tech conferences, there's something for everyone.
           </Text>
           <Text style={styles.text}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum.
+          Nearby Events: Find events happening near your location with just a tap. Our app uses advanced location-based services to show you events that are closest to you, making it easy to find something exciting to do, even at the last minute
           </Text>
           <Text style={styles.text}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum.
+          Personalized Recommendations: Get event suggestions tailored to your interests
+          </Text>
+          <Text style={styles.text}>
+          Event Details: Access comprehensive details about each event, including date, time, venue, and ticket information. Stay informed and never miss out on important updates
           </Text>
         </View>
       </ScrollView>
@@ -88,6 +78,14 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 20,
   },
+  heading1:{
+
+    fontSize:20,
+    marginBottom: 20,
+
+
+  }
+
 });
 
 export default AboutUsScreen;

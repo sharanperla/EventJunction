@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(false);
   const [userData, setUserData] = useState({});
   const [globalError, setGlobalError] = useState(null);
+  const [profileUpdated,setProfileUpdated]=useState(false)
 
   signInStart = () => {
     setIsLoading(true);
@@ -20,17 +21,21 @@ export const AuthProvider = ({ children }) => {
   signInSuccess = (value) => {
     setIsLoading(false);
     setUserData(value);
+
   };
   profileUpdateStart = () => {
     setIsLoading(true);
-  };
+    setProfileUpdated(false)
+  }
   profileUpdateSuccess = (data) => {
     setIsLoading(false);
     setGlobalError(null);
+    setProfileUpdated(true)
   };
   profileUpdateFailure = (error) => {
     setGlobalError(error);
     setIsLoading(false);
+    setProfileUpdated(false)
   };
   return (
     <AuthContext.Provider
@@ -47,6 +52,7 @@ export const AuthProvider = ({ children }) => {
         profileUpdateFailure,
         userData,
         setUserData,
+        profileUpdated,
       }}
     >
       {children}

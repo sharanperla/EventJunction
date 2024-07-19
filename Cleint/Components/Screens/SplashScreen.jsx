@@ -15,10 +15,10 @@ export default function SplashScreen({ navigation }) {
     navigation.navigate("SignIn");
   };
   return (
-    // <ImageBackground
-    //   source={require("../../assets/Background.png")}
-    //   style={styles.backgroundImage}
-    // >
+      // <ImageBackground
+      //   source={require("../../assets/Background.png")}
+      //   style={styles.backgroundImage}
+      // >
     <View style={styles.container}>
       <View style={styles.logoContainer}>
         <Image
@@ -34,7 +34,7 @@ export default function SplashScreen({ navigation }) {
         </Text>
       </Pressable>
     </View>
-    // </ImageBackground>
+    //  </ImageBackground>
   );
 }
 
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     // backgroundColor: "rgb(0,120,240)",
     backgroundColor: color.primaryColor,
-    // backgroundColor: "#F10EDB",
+    // backgroundColor: "",
     width: 300,
     paddingHorizontal: 11,
     paddingVertical: 14,

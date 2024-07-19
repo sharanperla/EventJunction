@@ -24,7 +24,7 @@ import color from '../../assets/color';
 
 
 export default function EditProfileScreen({navigation}){
-  const {profileUpdateStart,profileUpdateSuccess,profileUpdateFailure,userData,setUserData,globalError}=useContext(AuthContext)
+  const {profileUpdateStart,profileUpdateSuccess,profileUpdateFailure,userData,setUserData,globalError,profileUpdated}=useContext(AuthContext)
   const [selectedImage, setSelectedImage] = useState(null);
   const [formData,setFormData]=useState({})
   const [filePerc,setFileperc]=useState(null)
@@ -129,7 +129,7 @@ try {
           quality: 1,
         });
     
-        if (!result.cancelled) {
+        if (!result.canceled) {
           setSelectedImage(result.assets[0]);
             }
       } catch (error) {
@@ -229,7 +229,7 @@ const handleSubmit = async (e)=>{
                Save Changes
             </Text>
           </Pressable>
-          {updateSuccess&&<Text style={styles.success}>Successfully updated</Text>}
+          {profileUpdated&&<Text style={styles.success}>Successfully updated</Text>}
           {globalError&&<Text style={styles.success}>{globalError.message}</Text>}
         </View>
        

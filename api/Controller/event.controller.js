@@ -10,51 +10,76 @@ export const createEvent = async (req, res, next) => {
     next(error);
   }
 };
+export const deleteEvent = async (req, res, next) => {
+  try {
+    const {userId,eventId} = req.query;
+    if (!userId || !eventId) {
+      return res.status(400).json({ success: false, message: 'User ID and Event ID are required' });
+    }
+    const result = await Event.deleteOne({ userRef: userId, _id: eventId });
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ success: false, message: 'No events found' });
+    }
+    return res.status(200).json({ success: true, message: 'Event successfully deleted' });
+  } catch (error) {
+    next(error);
+  }
+
+};
 export const getAllEvents = async (req, res, next) => {
   try {
-    
     const limit = parseInt(req.query.limit) || 9;
     const startIndex = parseInt(req.query.startIndex) || 0;
-
     const searchTerm = req.query.searchTerm || "";
     const sort = req.query.sort || "createdAt";
     const order = req.query.order || "desc";
-    const userRef=req.query.userRef||" "
-    const eventLocation=req.body.eventLocation
-    let filter = { };
+    const userRef = req.query.userRef || "";
+    const maxDistance=req.query.maxDistance;
+    
+    let filter = {};
 
+    if (req.query.latitude && req.query.longitude) {
+      const latitude = parseFloat(req.query.latitude);
+      const longitude = parseFloat(req.query.longitude);
+      const maxDistance = 20 * 1000; // 20 kilometers in meters
 
-    if(eventLocation)
-    {
-      filter.eventLocation
-    }
-    if (searchTerm) {
-        filter.eventName = { $regex: searchTerm, $options: "i" }; // Case-insensitive by default
-      }
-    if (req.query.genre) {
-     
-      const genres = req.query.genre.split(","); // Split comma-separated genres
-      filter.eventGenere = { $in: genres }; // Filter by events with any of the genres
-    }
-    if (req.query.eventAmount) {
+      filter.eventLocation= {
+          $geoWithin: {
+            $centerSphere: [[longitude, latitude], maxDistance / 6371000] // Convert meters to radians
+          }
+        }
       
-        const specifiedAmount = parseInt(req.query.eventAmount);
-        filter.eventAmount = { $lt: specifiedAmount }; // Filter for events less than specified amount
-      }
-      if(userRef)
-      {
-        filter.userRef={$ne:userRef}
-      }
+    }
+
+    if (searchTerm) {
+      filter.eventName = { $regex: searchTerm, $options: "i" }; // Case-insensitive by default
+    }
+
+    if (req.query.genre) {
+      const genres = req.query.genre.split(",");
+      filter.eventGenere = { $in: genres };
+    }
+    const today = new Date();
+
+    filter.eDate = { $gte: today };
+
+    if (req.query.eventAmount) {
+      const specifiedAmount = parseInt(req.query.eventAmount);
+      filter.eventAmount = { $lt: specifiedAmount };
+    }
+
+    if (userRef) {
+      filter.userRef = { $ne: userRef };
+    }
 
     const events = await Event.find(filter)
       .sort({ [sort]: order })
       .limit(limit)
       .skip(startIndex);
-    console.log(events);
 
     return res.status(200).json(events);
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching events:", error);
     next(error);
   }
 };
@@ -98,6 +123,7 @@ export const bookEvent=async(req,res,next)=>{
   try {
     
     const { _id, userId,avatar } = req.body;
+    console.log('id,uid,avatar',_id,userId,avatar)
     const eventId=_id;
     const userRef=userId;
     const bookingData = { eventId, userRef ,avatar };
@@ -109,6 +135,24 @@ export const bookEvent=async(req,res,next)=>{
   }
 
 }
+export const unRegisterEvent=async(req,res,next)=>{
+  try {
+    const {userId,eventId} = req.query;
+    if (!userId || !eventId) {
+      return res.status(400).json({ success: false, message: 'User ID and Event ID are required' });
+    }
+    const result = await Bookings.deleteOne({ userRef: userId, eventId: eventId });
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ success: false, message: 'No booking found for the provided user ID and event ID' });
+    }
+    return res.status(200).json({ success: true, message: 'Booking successfully deleted' });
+  } catch (error) {
+    next(error);
+  }
+
+}
+
+
 export const getParticipants = async (req, res, next) => {
   if (req.query.id) {
       try {
@@ -144,12 +188,16 @@ export const getParticipants = async (req, res, next) => {
 export const getUserEvents = async (req, res, next) => {
   if (req.query.id) {
     try {
+      // 66992529a212f272f5ebecce 666ef1f7b7113418cb8dcda8
       const userId = req.query.id;
       const limit = parseInt(req.query.limit) || 10; 
       const skip= parseInt(req.query.skip) || 0; 
-
+      const thisweek=req.query.thisweek?!!req.query.thisweek:false;
+      console.log(thisweek);
+      
       // Find bookings with the specified userId
       const bookings = await Bookings.find({ userRef: userId });
+     
 
       if (!bookings || bookings.length === 0) {
         return res.status(404).json({ message: "No events found for this user" });
@@ -157,13 +205,26 @@ export const getUserEvents = async (req, res, next) => {
 
       // Extract event IDs from the bookings
       const eventIds = bookings.map(booking => booking.eventId);
-
+      let query={
+        _id: { $in: eventIds }
+      }
+      const today = new Date();
+      console.log('start',today);
+      // const startOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
+      const endOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 6);
+      console.log('end',endOfWeek);
+      
+      if (thisweek) {
+        query.eDate = { $gte: today, $lte: endOfWeek };
+      } else {
+        query.eDate = { $gte: today };
+      }
       // Find event details using the event IDs
-      const events = await Event.find({ _id: { $in: eventIds } }).skip(skip).sort({eDate:1}).limit(limit);
+      const events = await Event.find(query).skip(skip).sort({eDate:1}).limit(limit);
       console.log(events)
       // Prepare the response data
       const responseData = events.map(event => ({
-        eventId: event._id,
+        _id: event._id,
         eventName: event.eventName,
         eventDesc: event.eventDesc,
         place:event.place,
@@ -172,9 +233,6 @@ export const getUserEvents = async (req, res, next) => {
         likedBy: event.likedBy,
         eventGenere:event.eventGenere,
         eDate:event.eDate,
-
-        
-
         // Add any other event details you need from the event
       }));
 

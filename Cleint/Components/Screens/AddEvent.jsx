@@ -55,6 +55,7 @@ export default function AddEvent({navigation}) {
     setFormData({
       ...formData,
       eventLocation: newLocation,
+      place:place
     });
   };
 
@@ -118,7 +119,10 @@ export default function AddEvent({navigation}) {
       eventGenere: formData.eventGenere ? formData.eventGenere : null,
       eventName: formData.eventName ? formData.eventName : null,
       place: formData.place ? formData.place : "Location not selected",
-      eventLocation: formData.eventLocation ? formData.eventLocation : null,
+      eventLocation: formData.eventLocation ? {
+        type: "Point",
+        coordinates: [formData.eventLocation.longitude, formData.eventLocation.latitude],
+      } : null,
       EventImage: formData.EventImage ? formData.EventImage : null,
       Likes:0,
     };
@@ -204,7 +208,7 @@ export default function AddEvent({navigation}) {
         quality: 1,
       });
   
-      if (!result.cancelled) {
+      if (!result.canceled) {
         
         setSelectedImage(result.assets[0]);
           }

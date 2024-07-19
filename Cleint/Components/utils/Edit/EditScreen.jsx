@@ -12,38 +12,31 @@ import * as Location from "expo-location";
 import RNPickerSelect from "react-native-picker-select";
 
 import * as ImagePicker from 'expo-image-picker';
-import {getDownloadURL, getStorage, ref, uploadBytesResumable} from 'firebase/storage';
-import {app} from '../../../fireBase/firebase.config.jsx';
+import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
+import { app } from '../../../fireBase/firebase.config.jsx';
 
-// eDate: formData.eDate ? formData.eDate.dateString : null,
-//       eventAmount: formData.eventAmount ? formData.eventAmount : data.eventAmount,
-//       eventDesc: formData.eventDesc ? formData.eventDesc : data.eventDesc,
-//       eventGenere: formData.eventGenere ? formData.eventGenere : data.eventGenere,
-//       eventName: formData.eventName ? formData.eventName : data.eventName,
-//       place: formData.place ? formData.place : "Location not selected",
-//       eventLocation: formData.eventLocation ? formData.eventLocation : data.eventLocation,
-//       EventImage: formData.EventImage ? formData.EventImage : data.EventImage,
-//       Likes:0,
-
-
-export default function EditScreen({route,navigation}) {
-  const data=route.params.data;
+export default function EditScreen({ route, navigation }) {
+  const data = route.params.data;
   console.log(data._id);
-  const { isEventLoading, setIsEventLoading, eventData, globalError, editEventStart, editEventSuccess, editEventFailure} = useContext(EventContext);
-  const {userData } = useContext(AuthContext);
+  const { isEventLoading, setIsEventLoading, eventData, globalError, editEventStart, editEventSuccess, editEventFailure } = useContext(EventContext);
+  const { userData } = useContext(AuthContext);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isMapVisible, setIsMapVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [fileperc,setFileperc]=useState(0);
-  const [fileUploadError,setFileUploadError]=useState(null);
+  const [fileperc, setFileperc] = useState(0);
+  const [fileUploadError, setFileUploadError] = useState(null);
   const [place, setPlace] = useState(null);
-  const [formData, setFormData] = useState(data);
+  const [formData, setFormData] = useState({ ...data });
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [locPermission, setLocPermission] = useState();
-  const [fileUploadActive,setFileUploadActive]=useState(false)
-  const [success,setSuccess]=useState(false)
+  const [fileUploadActive, setFileUploadActive] = useState(false)
+  const [success, setSuccess] = useState(false)
 
+  let cordinates = {
+    longitude: formData?.eventLocation?.coordinates ? formData.eventLocation.coordinates[0] : null,
+    latitude: formData?.eventLocation?.coordinates ? formData.eventLocation.coordinates[1] : null,
+  };
 
   useEffect(() => {
     if (selectedLocation) {
@@ -52,8 +45,7 @@ export default function EditScreen({route,navigation}) {
       fetch(apiUrl)
         .then((response) => response.json())
         .then((data) => {
-          
-          setPlace(data.display_name);
+          setPlace(data?.display_name);
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
@@ -61,17 +53,17 @@ export default function EditScreen({route,navigation}) {
     }
   }, [selectedLocation]);
 
-
-  const handleMapPress = (event) => {
+  const handleMapPress
+  = (event) => {
     const newLocation = {
       latitude: event.nativeEvent.coordinate.latitude,
       longitude: event.nativeEvent.coordinate.longitude,
     };
     setSelectedLocation(newLocation);
-    setFormData({
-      ...formData,
+    setFormData((prevFormData) => ({
+      ...prevFormData,
       eventLocation: newLocation,
-    });
+    }));
   };
 
   const toggleMap = () => {
@@ -89,11 +81,10 @@ export default function EditScreen({route,navigation}) {
     if (key === "eventLocation") {
       toggleMap();
     }
-    setFormData({
-      ...formData,
+    setFormData((prevFormData) => ({
+      ...prevFormData,
       [key]: value,
-    });
-  
+    }));
   };
 
   useEffect(() => {
@@ -105,7 +96,6 @@ export default function EditScreen({route,navigation}) {
       }
       const location = await Location.getCurrentPositionAsync({});
       setLocPermission(location);
-   
     })();
   }, []);
 
@@ -128,12 +118,15 @@ export default function EditScreen({route,navigation}) {
       eventGenere: formData.eventGenere ? formData.eventGenere : null,
       eventName: formData.eventName ? formData.eventName : null,
       place: formData.place ? formData.place : "Location not selected",
-      eventLocation: formData.eventLocation ? formData.eventLocation : null,
+      eventLocation: formData.eventLocation ? {
+        type: "Point",
+        coordinates: [formData.eventLocation.longitude, formData.eventLocation.latitude],
+      } : null,
       EventImage: formData.EventImage ? formData.EventImage : "",
     };
-    
+
     try {
-      setSuccess(false)
+      setSuccess(false);
       editEventStart();
       const res = await fetch(`http://192.168.43.4:3000/api/event/updateEvent/${data._id}`, {
         method: 'POST',
@@ -142,41 +135,39 @@ export default function EditScreen({route,navigation}) {
         },
         body: JSON.stringify(formattedData),
       });
-  
+
       const contentType = res.headers.get('content-type');
       if (contentType && contentType.indexOf('application/json') !== -1) {
         const responseData = await res.json();
-        
+
         if (responseData.success === false) {
           editEventFailure(responseData.message);
           console.log('Error at success', responseData);
           return;
         }
-  
+
         // Update the formData state with the updated event data from the server
-        setFormData(responseData.data); // Assuming responseData contains the updated event data
+        setFormData(responseData?.data); // Assuming responseData contains the updated event data
         console.log("Form data submitted:", responseData);
-        setSuccess(true)
+        setSuccess(true);
         editEventSuccess(responseData.data);
       } else {
         const text = await res.text();
-        setSuccess(false)
+        setSuccess(false);
         console.error('Unexpected response format:', text);
         editEventFailure('Unexpected response format');
       }
     } catch (error) {
-      setSuccess(false)
+      setSuccess(false);
       console.log(error);
       editEventFailure(error.message);
     }
   };
-  
-  
 
   const uploadImage = async (selectedImage) => {
     try {
       setFileUploadActive(true);
-      if (!selectedImage) {     
+      if (!selectedImage) {
         console.log('No file selected');
         setFileUploadActive(false);
         return;
@@ -184,13 +175,13 @@ export default function EditScreen({route,navigation}) {
       const storage = getStorage(app);
       const fileName = new Date().getTime() + userData.user.username;
       const storageRef = ref(storage, fileName);
-    
+
       const response = await fetch(selectedImage.uri);
       const blob = await response.blob();
-    
+
       // Upload the blob to Firebase Storage
       const uploadTask = uploadBytesResumable(storageRef, blob);
-      
+
       uploadTask.on(
         'state_changed',
         (snapshot) => {
@@ -205,16 +196,18 @@ export default function EditScreen({route,navigation}) {
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadurl) => {
             console.log('File uploaded successfully:', downloadurl);
-            setFormData({ ...formData, EventImage: downloadurl });
+            setFormData((prevFormData) => ({
+              ...prevFormData,
+              EventImage: downloadurl,
+            }));
             setFileUploadActive(false);
           });
         }
       );
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-    };
-
+  };
 
   const pickImage = async () => {
     try {
@@ -224,21 +217,20 @@ export default function EditScreen({route,navigation}) {
         aspect: [4, 3],
         quality: 1,
       });
-  
+
       if (!result.canceled) {
-        
         setSelectedImage(result.assets[0]);
-          }
+      }
     } catch (error) {
       console.error("Error picking image:", error);
     }
   };
 
-  useEffect(()=>{
-    if(selectedImage){
+  useEffect(() => {
+    if (selectedImage) {
       uploadImage(selectedImage);
     }
-  },[selectedImage]);
+  }, [selectedImage]);
 
 
   return (
@@ -288,19 +280,19 @@ export default function EditScreen({route,navigation}) {
               <TextInput style={styles.PlaceinputStyle} placeholder={formData.place ? formData.place : "Place"} />
               <TouchableOpacity style={styles.mapButton} onPress={toggleMap}>
                 <Ionicons name="location-outline" size={30} />
-                <Modal isVisible={isMapVisible} onBackdropPress={toggleMap}>
+                <Modal isVisible={isMapVisible} onBackdropPress={toggleModal}>
                   <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
                     <MapView
                       style={{ width: 300, height: 300 }}
                       onPress={handleMapPress}
                       initialRegion={{
-                        latitude: locPermission ? locPermission.coords.latitude : 37.78825,
-                        longitude: locPermission ? locPermission.coords.longitude : -122.4324,
+                        latitude: cordinates ? cordinates.latitude : 37.78825,
+                        longitude: cordinates ? cordinates.longitude : -122.4324,
                         latitudeDelta: 0.0922,
                         longitudeDelta: 0.0421,
                       }}
                     >
-                      {selectedLocation?<Marker coordinate={selectedLocation}/>:<Marker coordinate={formData.eventLocation}/>}
+                      {selectedLocation&&<Marker coordinate={selectedLocation}/>}
                     </MapView>
                     <Button
                       title="Confirm Location"

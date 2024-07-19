@@ -5,7 +5,7 @@ import { FlatList, StyleSheet, Text, View,ImageBackground, Pressable } from 'rea
 export function Slider2({data, name }){
   const navigation=useNavigation();
   const handleNavigation =(item)=>{
-    navigation.navigate("DisplayScreen",{data:item})
+    navigation.navigate("DisplayScreen",{data:item,registeredPage:true})
   }
 
     return (

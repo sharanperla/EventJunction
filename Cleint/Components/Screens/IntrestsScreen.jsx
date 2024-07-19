@@ -2,14 +2,15 @@ import React, { useContext, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthContext } from "../../Context/AuthContext";
+import color from "../../assets/color";
 
 const interestsData = [
-  { id: 1, name: 'Music', image: require("../../assets/Intrests/music.png") },
-  { id: 2, name: 'Art', image: require("../../assets/Intrests/music.png") },
-  { id: 3, name: 'Dance', image: require("../../assets/Intrests/music.png") },
-  { id: 4, name: 'Drama', image: require("../../assets/Intrests/music.png") },
-  { id: 5, name: 'Sports', image: require("../../assets/Intrests/music.png") },
-  { id: 6, name: 'Other', image: require("../../assets/Intrests/music.png") }
+  { id: 1, name: 'Music', image: require("../../assets/Intrests/music.png")},
+  { id: 2, name: 'Festivals', image: require("../../assets/Intrests/festival.png") },
+  { id: 3, name: 'Dance', image: require("../../assets/Intrests/dance.png") },
+  { id: 4, name: 'Drama', image: require("../../assets/Intrests/drama.png") },
+  { id: 5, name: 'Sports', image: require("../../assets/Intrests/sports.png") },
+  { id: 6, name: 'beach', image: require("../../assets/Intrests/beach.png") }
 ];
 function IntrestsScreen({navigation}) {
 
@@ -82,6 +83,7 @@ function IntrestsScreen({navigation}) {
               <Image
                 source={interest.image}
                 style={styles.cardImage}
+                size={30}
               />
               <Text style={styles.cardText}>{interest.name}</Text>
             </TouchableOpacity>
@@ -122,10 +124,13 @@ function IntrestsScreen({navigation}) {
             <Text style={styles.cardText}>Music</Text>
           </View> */}
         </View>
-      <TouchableOpacity disabled={selectedInterests.length === 0} onPress={handleSubmit}><Text  style={[
-          styles.SplashButton,
-          selectedInterests.length === 0 && styles.disabledButton
-        ]} >Submit</Text></TouchableOpacity>
+        <View>
+
+          <TouchableOpacity disabled={selectedInterests.length === 0} onPress={handleSubmit}><Text  style={[
+              styles.SplashButton,
+              selectedInterests.length === 0 && styles.disabledButton
+            ]} >Submit</Text></TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -136,6 +141,7 @@ export default IntrestsScreen;
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: 20,
+    // justifyContent:'space-between'
   },
   subView1: {
     paddingTop: 20,
@@ -145,9 +151,11 @@ const styles = StyleSheet.create({
     fontSize: 17,
   },
   subView2: {
+
     paddingTop:20,
-    justifyContent:'center',
-    alignItems:'center'
+    justifyContent:'space-around',
+    alignItems:'center',
+    height:'90%',
   },
   cards: {
     flexDirection:'row',
@@ -156,7 +164,7 @@ const styles = StyleSheet.create({
     rowGap:15,
   },
   card: {
-    backgroundColor: "#ececec",
+    backgroundColor: "white",
     width: '29%',
     height:140,
     borderRadius:10,
@@ -165,7 +173,7 @@ const styles = StyleSheet.create({
     padding:10,
     alignItems:'center',
     gap:15,
-    shadowColor: "purple",
+    shadowColor: color.primaryColor,
 shadowOffset: {
   width: 0,
   height: 3,
@@ -179,7 +187,7 @@ elevation: 100
     textAlign:'center'
   },
   selectedCard: {
-    backgroundColor: "#d3d3d3", 
+    backgroundColor: color.primaryColor, 
     borderWidth:2,
     borderColor:'black',
     
@@ -191,8 +199,9 @@ elevation: 100
     display:'none'
   },
   SplashButton: {
-    color: "#fff",
-    backgroundColor: "#F10EDB",
+    // backgroundColor: "#F10EDB",
+    backgroundColor: color.primaryColor,
+    color:'#fff',
     width: 300,
     paddingHorizontal: 11,
     paddingVertical: 14,
@@ -203,8 +212,8 @@ elevation: 100
     marginTop:50,
   },
   disabledButton: {
-    backgroundColor: '#923E8A', // Gray background for disabled state
-    color: '#a9a9a9', // Light gray text for disabled state
+    backgroundColor: color.primaryDisabled,
+    opacity:0.5, // Gray background for disabled state
+    // color: '#fff', // Light gray text for disabled state
   }
-
 });

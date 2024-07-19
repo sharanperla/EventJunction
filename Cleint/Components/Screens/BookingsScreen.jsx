@@ -1,4 +1,4 @@
-import { ImageBackground, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Image, ImageBackground, StyleSheet, Text, View } from 'react-native'
 import React, { Component, useContext, useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Slider2 from '../utils/Slider2'
@@ -10,51 +10,91 @@ import { useFocusEffect } from '@react-navigation/native';
 export default function BookingsScreen() {
   const {userData}=useContext(AuthContext)
   const [getEventsError,setGetEventsError]=useState(false);
-  const [myEvents,setMyEvents]=useState({});
-  const [myUpcoming,setMyUpcoming]=useState({});
+  // const [myEvents,setMyEvents]=useState([]);
+  // const [myUpcoming,setMyUpcoming]=useState([]);
+  // const [weekEvent,setWeekEvent]=useState([])
+  const [myEvents,setMyEvents]=useState(null);
+  const [myUpcoming,setMyUpcoming]=useState(null);
+  const [weekEvent,setWeekEvent]=useState(null)
+  const [pageLoading,setPageLoading]=useState(false)
   useFocusEffect(
     React.useCallback(() => {
       getEvents();
     getUpcoming();
- 
+    getWeekEvent()
     }, [])
   );
 
   const getEvents=async ()=>{
     try {
+      setPageLoading(true)
       setGetEventsError(false)
-      const res=await fetch(`http://192.168.43.4:3000/api/event/getUserEvents?id=${userData.user._id}&limit=${10}&skip=1`)
+      console.log((userData.user._id));
+      const res=await fetch(`http://192.168.43.4:3000/api/event/getUserEvents?id=${userData.user._id}&limit=${10}`)
      
       const data=await res.json();
       if(data.success===false)
       {
-      
-        setGetEventsError(true)
+        setPageLoading(false)
+        setGetEventsError(data)
         return;
       }
-      setMyEvents(data.data)
+      setPageLoading(false)
+      setMyEvents(data?.data)
+      console.log('all',data);
       // console.log(myEvents)
     } catch (error) {
-      setGetEventsError(true)
+      setPageLoading(false)
+      setGetEventsError(error)
     }
     
   }
   const getUpcoming=async ()=>{
     try {
+      setPageLoading(true)
       setGetEventsError(false)
       const res=await fetch(`http://192.168.43.4:3000/api/event/getUserEvents?id=${userData.user._id}&limit=${1}`)
      
       const data=await res.json();
-      if(data.success===false)
+      if(data.status!=="success")
       {
-      
-        setGetEventsError(true)
-        console.log(data);
+        setPageLoading(false)
+        setGetEventsError(data)
+        console.log('inside upcoing',data);
         return;
       }
-      setMyUpcoming(data.data[0])
+      setPageLoading(false)
+      setMyUpcoming(data?.data[0])
+      // console.log('upcoming',data.data[0]);
+
+      console.log(data);
     } catch (error) {
-      setGetEventsError(true)
+      setPageLoading(false)
+      setGetEventsError(error)
+      console.log(error);
+    }
+    
+  }
+  const getWeekEvent=async ()=>{
+    try {
+      setPageLoading(true)
+      setGetEventsError(false)
+      const res=await fetch(`http://192.168.43.4:3000/api/event/getUserEvents?id=${userData.user._id}&thisweek=${true}`)
+     
+      const data=await res.json();
+      if(data.status!=="success")
+      {
+        setPageLoading(false)
+        setGetEventsError(data)
+        console.log('week',data);
+        return;
+      }
+      setPageLoading(false)
+      setWeekEvent(data?.data)
+      console.log('week events',data);
+    } catch (error) {
+      setPageLoading(false)
+      setGetEventsError(error)
       console.log(error);
     }
     
@@ -64,15 +104,19 @@ export default function BookingsScreen() {
   useEffect(() => {
     getEvents();
     getUpcoming()
+    getWeekEvent()
   }, [])
-
 
     return (
       <SafeAreaView>
         <ScrollView style={styles.MainContainer}>
-        <View style={styles.LatestContainer}>
+          {pageLoading&& <View style={styles.spinner}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>}
+        {!pageLoading&&myUpcoming!==null&&<View style={styles.LatestContainer}>
           <Text style={styles.CategoryTitle}>Upcoming</Text>
-             {myUpcoming&&<View><ImageBackground resizeMode='cover'
+             <View><ImageBackground
+              ImageBackground resizeMode='cover'
              source={{ uri: myUpcoming.EventImage?  myUpcoming.EventImage: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOoU11lhsr7WFgMFxqYTLCo9cYSQtnE5NzYhLw1aFx_A&s" }}
              style={styles.LatestBackground} >
 
@@ -84,10 +128,15 @@ export default function BookingsScreen() {
              </View>
              </ImageBackground>
              
-             </View>}
-        </View>
-       <Slider2 data={myEvents} name={"This Week"}/>
-       <Slider2 data={myEvents} name={"Others"}/>
+             </View>
+        </View>}
+      {  console.log("error here",getEventsError)}
+        {getEventsError&&<View style={styles.notFoundContainer}>
+          <Image style={styles.illlustration} source={require("../../assets/illustrations/bookingnotfound.png")} size={5} />
+          <Text style={styles.error}>{`No booked events!`}</Text>
+          </View>}
+       {weekEvent&&weekEvent.length>0&&<Slider2 data={weekEvent} name={"This Week"}/>}
+       {myEvents&&myEvents?.length>0&&<Slider2 data={myEvents} name={"Others"}/>}
   
        </ScrollView>
       </SafeAreaView>
@@ -145,8 +194,32 @@ margin:5,
 Desc:{
  color:'white',
  fontSize:9
-}
+},
+error:{
+  color:'black',
+  fontSize:18,
+  textAlign:'center',
+  marginVertical:5
 
+},
+spinner: {
+  height: "100%",
+  justifyContent: "center",
+  alignItems: "center",
+},
+illlustration:{
+  width:300,
+  height:300,
+  objectFit:'contain',
+  borderRadius:10,
+},
+notFoundContainer:{
+  width:'100%',
+  height:'100%',
+  justifyContent:'center',
+  alignItems:'center',
+  marginVertical:90,
+}
 
 })
 // SliderName:{

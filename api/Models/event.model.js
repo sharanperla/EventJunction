@@ -17,10 +17,14 @@ const eventSchema=new mongoose.Schema({
         type: Date,
         required:true,
     },
-    eventLocation:{
-        latitude:Number,
-        longitude:Number,
-    },
+    // eventLocation:{
+    //     latitude:Number,
+    //     longitude:Number,
+    // },
+    eventLocation: {
+        type: { type: String, default: "Point" },
+        coordinates: { type: [Number], index: "2dsphere" }
+      },
     place:{
         type:String,
        
@@ -49,7 +53,7 @@ const eventSchema=new mongoose.Schema({
         default: [], // Initialize likedBy as an empty array
       },
 },{timestamps:true});
- 
+
 const Event= mongoose.model('Event',eventSchema);
 
 export default Event; 
